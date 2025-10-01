@@ -13,3 +13,8 @@ def index(request):
     context = {'Program' : program_lists}
 
     return render(request, 'backends/index.html', context)
+
+
+def detail(request, program_id):
+    program = get_object_or_404(Program, pk=program_id)
+    return render(request, 'backends/detail.html', {'program': program})

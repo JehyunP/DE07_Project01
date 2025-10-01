@@ -1,0 +1,37 @@
+<h1>{{ program.title }}</h1>
+<p>{{ program.description }}</p>
+<p>장르: {{ program.genre.name }}</p>
+{% if program.sub_genre %}
+    <p>서브장르: {{ program.sub_genre.name }}</p>
+{% endif %}
+<p>개봉년도: {{ program.release }}</p>
+<p>국가: {{ program.country }}</p>
+<p>제작사: {{ program.production }}</p>
+<img src="{{ program.poster }}" alt="{{ program.title }} 포스터" width="200">
+
+<h3>성과 데이터</h3>
+<ul>
+    {% for perf in program.performances.all %}
+    <li>{{ perf.half_year }}: {{ perf.views }} views, {{ perf.hours }} hours</li>
+    {% empty %}
+    <li>성과 데이터 없음</li>
+    {% endfor %}
+</ul>
+
+<h3>OTT 플랫폼</h3>
+<ul>
+    {% for s in program.streamings.all %}
+    <li>{{ s.ott }}</li>
+    {% empty %}
+    <li>플랫폼 정보 없음</li>
+    {% endfor %}
+</ul>
+
+<h3>출연/제작진</h3>
+<ul>
+    {% for role in program.person_roles.all %}
+    <li>{{ role.person.name }} ({{ role.role }})</li>
+    {% empty %}
+    <li>출연/제작진 정보 없음</li>
+    {% endfor %}
+</ul>
