@@ -5,5 +5,5 @@ from . import views
 app_name = 'backends'
 urlpatterns = [
     path('',views.index, name='index'),
-    path('<int:problem_id>/', views.detail, name='detail'),
+    path('<int:program_id>/', views.detail, name='detail'),
 ]

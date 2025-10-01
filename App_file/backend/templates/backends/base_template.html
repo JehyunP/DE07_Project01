@@ -1,0 +1,47 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %} OTT Program Dashboard {% endblock %}</title>
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    </head>
+
+    <body>
+        <header>
+            <h1>OTT Dashboard</h1>
+            <nav>
+                <a href="{% url 'backends:index' %}">홈</a> |
+            <a href="/admin/">관리자</a>
+            </nav>
+        </header>
+
+        <main>
+            {% block content %} {% endblock %}
+        </main>
+
+        <footer>
+        <p id="project_team_no"><b>DE07 Quad Core</b></p>
+        <p><b>Team Members</b>
+            박제현 - parkjehyun0131@gmail.com |
+            박채은 - pea1101ce@gmail.com |
+            어선아 - aneoseo14@gmail.com |
+            천준규 - june017323@gmail.com
+        </p>
+
+        <p>Data Source: <a href="https://flixpatrol.com/" target="_blank">FlixPatrol</a></p>
+        <p><strong>Project Repository:</strong> 
+        <a href="https://github.com/JehyunP/DE07_Project01" target="_blank">GitHub</a></p>
+
+        <p>Powered by Django · Plotly · Bootstrap</p>
+
+        <p>© 2025 OTT Trend Analysis Project.  
+        학습 목적의 데이터 시각화 프로젝트입니다.</p>
+
+        <p>Last Updated: 2025-10-01</p>
+    </footer>
+    </body>
+
+
+    
+</html>

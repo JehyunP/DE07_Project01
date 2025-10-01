@@ -1,1 +1,18 @@
-<h1>hello</h1>
+{% extends 'backends/base_template.html' %}
+
+{% block title %}메인 페이지{% endblock %}
+
+{% block content %}
+<h2>프로그램 목록</h2>
+<ul>
+    {% for program in programs %}
+        <li>
+            <a href="{% url 'backends:detail' program.id %}">
+                {{ program.title }}
+            </a> ({{ program.release }}, {{ program.genre.name }})
+        </li>
+    {% empty %}
+        <li>등록된 프로그램이 없습니다.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

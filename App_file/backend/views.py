@@ -18,3 +18,4 @@ def index(request):
 def detail(request, program_id):
     program = get_object_or_404(Program, pk=program_id)
     return render(request, 'backends/detail.html', {'program': program})
+
