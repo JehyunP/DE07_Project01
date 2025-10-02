@@ -51,13 +51,6 @@ main {
     padding: 20px;
     min-height: 70vh; 
 }
-
-.card {
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    border: none;
-    transition: transform 0.2s ease-in-out;
-}
 .card:hover {
     transform: translateY(-5px);
 }
@@ -112,3 +105,38 @@ footer a:hover {
     width: 100% !important;
     height: 600px !important;  /* 필요하면 조절 가능 */
 }
+
+
+
+/*
+    Genre Detail
+*/
+.back-card {
+    position: fixed;
+    bottom: 300px;  
+    left: 30px;     
+    text-decoration: none;
+    z-index: 1000;
+}
+
+.back-card-body {
+    background: #1f2937;   
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+}
+
+.back-card-body:hover {
+    background: #374151;  
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+
+/*
+    Detail
+*/

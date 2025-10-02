@@ -109,7 +109,7 @@ def rank_half_year_plot(df):
             categoryorder="array", categoryarray=order
         ),
         yaxis=dict(
-            title=dict(text="조회수 랭킹", font=dict(size=16, family="Verdana", color="black")),
+            title=dict(text="조회수 순위", font=dict(size=16, family="Verdana", color="black")),
             tickfont=dict(size=12, family="Courier New", color="gray"),
             autorange="reversed", dtick=1
         ),
@@ -129,21 +129,71 @@ def rank_half_year_plot(df):
             x=0.1, y=1.15, xanchor="right", yanchor="top",
             buttons=[
                 dict(
-                    label="조회수 랭킹",
+                    label="조회수 순위",
                     method="update",
                     args=[{"visible": view_mask},
-                        {"yaxis": {"title": {"text": "조회수 랭킹"},
+                        {"yaxis": {"title": {"text": "조회수 순위"},
                                     "autorange": "reversed", "dtick": 1}}]
                 ),
                 dict(
-                    label="시청시간 랭킹",
+                    label="시청시간 순위",
                     method="update",
                     args=[{"visible": hour_mask},
-                        {"yaxis": {"title": {"text": "시청시간 랭킹"},
+                        {"yaxis": {"title": {"text": "시청시간 순위"},
                                     "autorange": "reversed", "dtick": 1}}]
                 ),
             ]
         )]
     )
 
+    return pio.to_html(fig, full_html=False)
+
+
+def wrap_labels(text, width=20):
+    return '<br>'.join([text[i:i+width] for i in range(0, len(text), width)])
+
+def detail_bar_plot(df, genre, half_year, mode):
+    y_col = "views" if mode == "views" else "hours"
+    y_label = "조회수" if mode == "views" else "시청시간"
+    df["wrapped_title"] = df["title"].apply(lambda x: wrap_labels(x, 18))
+    
+    fig = px.bar(
+        df,
+        x="wrapped_title",
+        y=y_col,
+        text=y_col,
+        color="title",
+        color_discrete_sequence=px.colors.qualitative.Bold,  
+        title=f"{half_year} {genre} - Top 5 프로그램 ({y_label} 기준)",
+        custom_data=["id"],
+    )
+
+
+    fig.update_traces(
+        texttemplate='%{text:,}',
+        textposition="outside",
+        hovertemplate="<b>%{x}</b><br>" + y_label + ": %{y:,}<extra></extra>"
+    )
+    fig.update_layout(
+        xaxis_title="프로그램",
+        yaxis_title=y_label,
+        title_font=dict(size=28, family="Arial Black", color="darkblue"),
+        xaxis=dict(
+            title=dict(font=dict(size=20, family="Verdana", color="black")), 
+            tickfont=dict(size=16, family="Verdana", color="black"),
+            tickangle=0,
+            automargin=True,
+            ticklabelposition="outside bottom"  
+            
+        ),
+        yaxis=dict(
+            title=dict(font=dict(size=20, family="Verdana", color="black")),
+            tickfont=dict(size=16, family="Verdana", color="black")      
+        ),
+        plot_bgcolor="white",
+        margin=dict(l=60, r=40, t=100, b=80),
+        bargap=0.35,
+        showlegend=False
+    )
+    
     return pio.to_html(fig, full_html=False)

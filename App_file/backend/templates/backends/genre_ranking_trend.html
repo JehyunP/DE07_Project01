@@ -10,4 +10,19 @@
     </div>
 </div>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var plot = document.querySelector(".plotly-graph-div");
+        if (!plot) return;
+
+        plot.on('plotly_click', function (data) {
+        var genre = data.points[0].data.name;
+        var half_year = data.points[0].x;
+        var mode = data.points[0].data.customdata ? data.points[0].data.customdata[0] : "views"; 
+
+        window.location.href = `/genreDetail/?genre=${genre}&half_year=${half_year}&mode=${mode}`;
+        });
+    });
+    </script>
 {% endblock %}

@@ -1,0 +1,49 @@
+{% extends 'backends/base_template.html' %}
+{% block title %}상세 장르 분석{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="card chart-card">
+        <div class="card-body">
+            {{ chart|safe }}
+        </div>
+    </div>
+</div>
+
+<!-- 카드형 뒤로가기 버튼 -->
+<a href="{% url 'backends:genreTrend' %}" class="back-card">
+    <div class="back-card-body">
+        ← 뒤로가기
+    </div>
+</a>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    var plot = document.querySelector(".plotly-graph-div");
+    if (!plot) return;
+
+    plot.on('plotly_click', function (data) {
+        var programId = data.points[0].customdata[0];
+        if (!programId) return;
+
+        var width = 1200, height = 900;
+        var left = (screen.width - width) / 2;
+        var top = (screen.height - height) / 2;
+
+        var urlTemplate = "{% url 'backends:detail' 0 %}";
+        var programUrl = urlTemplate.replace("0", programId);
+
+        window.open(
+            programUrl,
+            "ProgramDetail",
+            "width=" + width +
+            ",height=" + height +
+            ",left=" + left +
+            ",top=" + top +
+            ",resizable=yes,scrollbars=yes"
+        );
+    });
+});
+</script>
+
+{% endblock %}

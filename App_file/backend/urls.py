@@ -6,5 +6,7 @@ app_name = 'backends'
 urlpatterns = [
     path('',views.index, name='index'),
     path('<int:program_id>/', views.detail, name='detail'),
-    path('genreTrend/', views.genreTrand, name='genreTrend'),
+    path('genreTrend/', views.genreTrend, name='genreTrend'),
+    path('genreDetail/', views.genreDetail, name='genreDetail'),
+
 ]

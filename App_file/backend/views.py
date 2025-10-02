@@ -1,8 +1,6 @@
 from .models import *
 from django.shortcuts import render, get_object_or_404
 import pandas as pd
-import plotly.express as px
-import plotly.io as pio
 from django.db.models import Sum, Count, FloatField
 from django.db.models.functions import Cast
 from django.db.models.functions import RowNumber
@@ -11,6 +9,9 @@ from django.shortcuts import render
 from .models import Performance
 from django.db.models import F
 from . import visualize
+import ast
+
+
 
 
 # Create your views here.
@@ -23,10 +24,25 @@ def index(request):
 
 def detail(request, program_id):
     program = get_object_or_404(Program, pk=program_id)
-    return render(request, 'backends/detail.html', {'program': program})
+
+    performances = program.performances.all().order_by("-half_year")  
+    streamings = program.streamings.all()  
+    directors = program.person_roles.filter(role__iexact="director")
+    actors = program.person_roles.filter(role__iexact="starring")
+    producers = program.person_roles.filter(role__iexact="producer")
+
+    context = {
+        "program": program,
+        "performances": performances,
+        "streamings": streamings,
+        "directors": directors,
+        "actors": actors,
+        "producers": producers,
+    }
+    return render(request, "backends/detail.html", context)
 
 
-def genreTrand(request):
+def genreTrend(request):
     qs = (
         Performance.objects.
         values('half_year', 'program__genre__name')
@@ -61,6 +77,31 @@ def genreTrand(request):
     )
 
 
+def genreDetail(request):
+    genre = request.GET.get("genre")
+    half_year = request.GET.get("half_year")
+    mode = request.GET.get("mode")
+
+    qs = (
+        Performance.objects
+        .filter(half_year=half_year, program__genre__name=genre)
+        .select_related("program")
+        .order_by("-views" if mode == "views" else "-hours")[:5]
+    )
+
+    df = pd.DataFrame([
+        {
+            "id": p.program.id,
+            "title": p.program.title,
+            "views": p.views,
+            "hours": p.hours
+        }
+        for p in qs
+    ])
+
+    chart_html = visualize.detail_bar_plot(df, genre, half_year, mode)
+
+    return render(request, "backends/genre_detail.html", {"chart": chart_html})
 
 
 def index(request):
