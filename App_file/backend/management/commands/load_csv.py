@@ -16,7 +16,7 @@ class Command(BaseCommand):
 
         def clean_str(val):
             if pd.isna(val):
-                return ""
+                return None
             s = str(val).strip()
             return s if s else ""
 

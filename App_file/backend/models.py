@@ -19,10 +19,10 @@ class Program(models.Model):
     title = models.CharField(max_length=200, verbose_name='프로그램 제목')
     runtime_hour = models.FloatField(verbose_name='상영시간 (시간)')
     poster = models.URLField(max_length=500, verbose_name='포스터 URL')
-    description = models.TextField(verbose_name='프로그램 설명')
+    description = models.TextField(null=True, verbose_name='프로그램 설명')
     program_type = models.CharField(max_length=100, verbose_name='프로그램 타입')  # ex: Movie, TV Show
     release = models.IntegerField(verbose_name='개봉년도')
-    production = models.CharField(max_length=200, verbose_name='제작사')
+    production = models.CharField(null=True, max_length=200, verbose_name='제작사')
     country = models.CharField(max_length=200, verbose_name='제작 국가')
 
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, verbose_name='장르')
@@ -42,7 +42,7 @@ class Performance(models.Model):
     hours = models.BigIntegerField(verbose_name='시청 시간')
     views = models.BigIntegerField(verbose_name='조회 수')
     imdb = models.FloatField(verbose_name='IMDB 평점')
-    rotten_tomatoes = models.IntegerField(verbose_name='Rotten Tomatoes 평점')
+    rotten_tomatoes = models.IntegerField(null=True, verbose_name='Rotten Tomatoes 평점')
     rank = models.IntegerField(verbose_name='순위')
     half_year = models.CharField(max_length=20, verbose_name='연도 및 반기')  
 
