@@ -1,0 +1,52 @@
+/* --------------------
+    Default Setting
+-------------------- */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    
+}
+
+/* --------------------
+    Header 
+-------------------- */
+header {
+    display: flex;                 
+    justify-content: space-between;
+    align-items: center;           
+    padding: 10px 20px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+header nav a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+/* --------------------
+    Main Body
+-------------------- */
+main {
+    padding: 20px;
+    min-height: 70vh; 
+}
+
+/* --------------------
+    Footer
+-------------------- */
+footer {
+    text-align: center;   
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-top: 1px solid #ddd;
+    font-size: 0.9rem;
+    color: #555;
+}

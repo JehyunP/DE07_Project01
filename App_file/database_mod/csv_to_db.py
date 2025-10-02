@@ -12,14 +12,14 @@ from backend.models import Genre, SubGenre, Program, Performance, Streaming, Per
 
 
 # 기존 저장된 데이터 삭제가 필요할 때
-# def clear_tables():
-#     Genre.objects.all().delete()
-#     SubGenre.objects.all().delete()
-#     Program.objects.all().delete()
-#     Performance.objects.all().delete()
-#     Streaming.objects.all().delete()
-#     Person.objects.all().delete()
-#     ProgramPersonRole.objects.all().delete()
+def clear_tables():
+    Genre.objects.all().delete()
+    SubGenre.objects.all().delete()
+    Program.objects.all().delete()
+    Performance.objects.all().delete()
+    Streaming.objects.all().delete()
+    Person.objects.all().delete()
+    ProgramPersonRole.objects.all().delete()
 
 
 # 런타임 문자열 -> float 변환 ex) 1:30 -> 1.5
