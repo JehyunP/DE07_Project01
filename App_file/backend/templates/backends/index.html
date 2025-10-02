@@ -3,16 +3,52 @@
 {% block title %}메인 페이지{% endblock %}
 
 {% block content %}
-<h2>프로그램 목록</h2>
-<ul>
-    {% for program in programs %}
-        <li>
-            <a href="{% url 'backends:detail' program.id %}">
-                {{ program.title }}
-            </a> ({{ program.release }}, {{ program.genre.name }})
-        </li>
-    {% empty %}
-        <li>등록된 프로그램이 없습니다.</li>
-    {% endfor %}
-</ul>
+<!-- Top Section: 1위 장르 -->
+<div class="section" style="background-color: hsl(20, 24%, 93%);">
+    <br><div class="title">25년 상반기 1위</div><br>
+    <img class="large-poster" src={{ top_program.poster }} alt="{{ genre.name }}">
+    <h1 class="trade-text"><strong>{{ top_program.title }}</strong></h1>
+    <h1 style="font-size : 20px;" class="trade-text">{{ top_program.genre }}</h1><br>
+    <div class="button-group">
+        {% for genre in top_genres %}
+            <button>{{ genre.name }}</button>
+        {% endfor %}
+    </div>
+</div>
+<!-- Middle Section: 트렌드 장르 -->
+<div class="section" style="background-color: #FFF3E0;">
+    <div class="title">25년 상반기 트렌드 장르</div>
+    <div class="title">{{ trend_program_genre_name }}</div>
+    <div class="grid" style="display: flex; justify-content: center; gap: 0px; padding: 20px;">
+        {% for program in trend_program %}
+            <div class="trend_card">
+                <img class="trend-poster" src={{ program.poster }} alt="{{ genre.name }}">
+            </div>
+        {% endfor %}
+    </div>
+</div>
+    <!-- Bottom Section: 인기 드라마 -->
+<div style="display: grid; grid-template-columns: 1fr 1fr;">
+    <div style="position: relative; margin: 5px auto; width: 99%; height: 98%;
+    background: #D0EAFF; border-radius: 2px; padding-top: 60px;">
+    <!-- 상단 중앙 텍스트 -->
+    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 20px; font-weight: bold;">국가별 인기 드라마</div>
+        <div class="grid" style="display: flex; justify-content: center; gap: 30px; padding: 20px;">
+        {% for program in country_program %}
+            <img class="country-poster" src={{ program.program.poster }} alt="국가별 인기 드라마">
+        {% endfor %}
+    </div>
+    </div>
+    <div style="position: relative; margin: 5px auto; width: 99%; height: 98%;
+    background: #D0EAFF; border-radius: 2px; padding-top: 60px;">
+    <!-- 상단 중앙 텍스트 -->
+    <div style="position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+    font-size: 20px; font-weight: bold;">장르별 인기 드라마</div>
+        <div class="grid" style="display: flex; justify-content: center; gap: 30px; padding: 20px;">
+        {% for program in genre_program %}
+            <img class="country-poster" src={{ program.program.poster }} alt="국가별 인기 드라마">
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

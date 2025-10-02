@@ -2,9 +2,11 @@
     Default Setting
 -------------------- */
 body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
     margin: 0;
-    font-family: Arial, sans-serif;
-    
+    padding: 0;
 }
 
 /* --------------------
@@ -14,21 +16,32 @@ header {
     display: flex;                 
     justify-content: space-between;
     align-items: center;           
-    padding: 10px 20px;
-    background-color: #f8f8f8;
+    padding: 15px 30px;
+    background-color: #2c3e50;
     border-bottom: 1px solid #ddd;
 }
 
 header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+header h1 a {
+    text-decoration: none;  
+    color: #ecf0f1;     
 }
 
 header nav a {
     margin-left: 15px;
     text-decoration: none;
-    color: #333;
+    color: #ecf0f1;
     font-weight: bold;
+    transition: color 0.3s;
+}
+
+header nav a:hover {
+    color: #1abc9c;
 }
 
 /* --------------------
@@ -39,14 +52,63 @@ main {
     min-height: 70vh; 
 }
 
+.card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border: none;
+    transition: transform 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 15px;
+}
+
 /* --------------------
     Footer
 -------------------- */
 footer {
-    text-align: center;   
+    text-align: center;
+    background-color: #2c3e50;
+    color: #ecf0f1;
     padding: 20px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #ddd;
     font-size: 0.9rem;
-    color: #555;
+    margin-top: 50px;
+}
+footer a {
+    color: #1abc9c;
+    text-decoration: none;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+
+
+
+/*
+    Genre_ranking_trend
+*/
+
+/* 카드 스타일 */
+.chart-card {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-bottom: 30px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+/* Plotly 차트 크기 */
+.js-plotly-plot {
+    width: 100% !important;
+    height: 600px !important;  /* 필요하면 조절 가능 */
 }

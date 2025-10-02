@@ -1,0 +1,13 @@
+{% extends 'backends/base_template.html' %}
+{% block title %}반기별 인기 장르{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+<div class="card chart-card">
+    <div class="card-body">
+    {{ chart_drop|safe }}
+    </div>
+</div>
+</div>
+{% endblock %}

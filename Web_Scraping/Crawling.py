@@ -15,8 +15,8 @@ import pandas as pd
 
 # Target URL and YEAR selection
 URL = 'https://flixpatrol.com/most-watched/'
-YEAR = ['2023-1', '2023-2', '2023', '2024-1', '2024-2', '2024', '2025-1']
-
+#YEAR = ['2023-1', '2023-2', '2023', '2024-1', '2024-2', '2024', '2025-1']
+YEAR = ['2025-1']
 
 # crawled data will be stored into list then 
 temporary_can = []
@@ -47,13 +47,13 @@ options.add_experimental_option('excludeSwitches', ['enable-logging'])
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # loop through all years
-for year in YEAR:
+for half_year in YEAR:
 
     # Loop for 10 pages: 1-10
     # try except block to handle any errors during scraping
     try:
         for i in range(1, 7):
-            page_url = URL + year + '/page-' + str(i) + '/'
+            page_url = URL + half_year + '/page-' + str(i) + '/'
             driver.get(page_url)
     
             try:
@@ -79,9 +79,13 @@ for year in YEAR:
                 # Extract data from each column
                 try:
                     rank = cols[0].get_text(strip=True).replace(".", "")
-                    title = cols[1].select_one("span.group-hover\\:underline").get_text(strip=True)
+                    title_elem = cols[1].select_one("span.group-hover\\:underline")
+                    series_elem = cols[1].select_one("span.text-sm.text-gray-500.whitespace-nowrap")     
+                    title = title_elem.get_text(strip=True) if title_elem else None
+                    if series_elem:
+                        title = f"{title} {series_elem.get_text(strip=True)}"
                     type = cols[2].get_text(strip=True)
-                    premiere = cols[3].get_text(strip=True)
+                    release = cols[3].get_text(strip=True)
                     genre = cols[4].get_text(strip=True)
                     country = cols[5].find("span")["title"]
                     hours = cols[6].find("div").get_text(strip=True)
@@ -89,6 +93,7 @@ for year in YEAR:
                     views = cols[8].find("div").get_text(strip=True)
                 except Exception as e:
                     print(f'Error Occured at mainpage with {e}')
+                print(title)
 
                 # Navigate to the detail page to get more information     
                 link = cols[1].find("a")["href"]
@@ -134,40 +139,40 @@ for year in YEAR:
                 produced_by = info_dict.get('Produced by', None)
 
                 try:
-                    ott = None
+                    production = None
 
-                    ott_elem_span = detail_soup.select_one(
+                    production_elem_span = detail_soup.select_one(
                         "div.flex.gap-x-1.items-center span[title] + span"
                     )
-                    if ott_elem_span:
-                        ott = ott_elem_span.get_text(strip=True).rstrip('|')
+                    if production_elem_span:
+                        production = production_elem_span.get_text(strip=True).rstrip('|')
 
-                    if not ott:
-                        ott_elem_div = detail_soup.select_one(
+                    if not production:
+                        production_elem_div = detail_soup.select_one(
                             "div.flex.flex-wrap.gap-x-1.text-sm > div:nth-child(4)"
                         )
-                        if ott_elem_div:
-                            text = ott_elem_div.get_text(strip=True).rstrip('|')
+                        if production_elem_div:
+                            text = production_elem_div.get_text(strip=True).rstrip('|')
                             if text != genre:
-                                ott = text
+                                production = text
 
                 except Exception as e:
-                    print(f'Error extracting ott for {title}: {e}')
-                    ott = None
+                    print(f'Error extracting production for {title}: {e}')
+                    production = None
 
                 try:
-                    genre_position = 6 if ott else 5
-                    specific_genre = detail_soup.select_one(
+                    genre_position = 6 if production else 5
+                    sub_genre = detail_soup.select_one(
                         f"div.flex.flex-wrap.gap-x-1.text-sm.leading-6.text-gray-500 > div:nth-child({genre_position})"
                     ).get_text(strip=True).rstrip('|')
                 except Exception as e:
-                    print(f'Error extracting specific_genre for {title}: {e}')
-                    specific_genre = None
+                    print(f'Error extracting sub_genre for {title}: {e}')
+                    sub_genre = None
 
 
                 imdb = detail_soup.select_one(
                     "div.flex.flex-wrap.justify-around.text-center > div.px-2.py-4.w-32 > div.mb-1.text-2xl.text-gray-400"
-                ).get_text(strip=True).rstrip('/10')
+                ).get_text(strip=True).split('/')[0]
                 
 
 
@@ -179,7 +184,7 @@ for year in YEAR:
                 try:
                     poster_elem = driver.find_element(
                         By.XPATH,
-                        "/html/body/div[4]/div/div[1]/div/picture/img"
+                        "/html/body/div[4]/div/div[1]/div/div/picture/img"
                     )
                     poster = poster_elem.get_attribute("src")  
                 except Exception as e:
@@ -213,7 +218,7 @@ for year in YEAR:
                         span = h2.select_one("span:nth-of-type(2)")
                         if span:
                             text = span.get_text(strip=True)
-                            match = text.rsplit("on", 1)[-1].strip()
+                            match = text.rsplit(" on ", 1)[-1].strip()
                             if match:
                                 streamings.append(match)
                 else:
@@ -224,7 +229,7 @@ for year in YEAR:
                     'Rank':rank,
                     'Title' : title, 
                     'Type' : type, 
-                    'Premiere' : premiere, 
+                    'Release' : release, 
                     'Genre' : genre, 
                     'Country' : country, 
                     'Hours' : hours, 
@@ -234,13 +239,13 @@ for year in YEAR:
                     'Starring' : starring,
                     'Directors' : directors, 
                     'Produced_by' : produced_by, 
-                    'Specific_genre' : specific_genre, 
+                    'Sub_genre' : sub_genre, 
                     'IMDB' : imdb, 
                     'Rotten_Tomatoes' : rotten_tomatos,
                     'Poster' : poster, 
-                    'Year' : year, 
+                    'Half_Year' : half_year, 
                     'Streaming' : streamings, 
-                    'OTT': ott
+                    'Production': production
                 }
                 temporary_can.append(data)
                 print(f'rank: {rank}\tdata: {title}')
