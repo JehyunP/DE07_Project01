@@ -8,5 +8,5 @@ urlpatterns = [
     path('<int:program_id>/', views.detail, name='detail'),
     path('genreTrend/', views.genreTrend, name='genreTrend'),
     path('genreDetail/', views.genreDetail, name='genreDetail'),
-
+    path('ottplatformTrend/', views.ottplatformTrend, name='ottplatformTrend'),
 ]

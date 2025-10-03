@@ -1,17 +1,27 @@
-from .models import *
-from django.shortcuts import render, get_object_or_404
-import pandas as pd
-from django.db.models import Sum, Count, FloatField
-from django.db.models.functions import Cast
-from django.db.models.functions import RowNumber
-from django.db.models import Window
-from django.shortcuts import render
-from .models import Performance
-from django.db.models import F
-from . import visualize
+# 파이썬 기본 유틸리티
+from io import BytesIO
+import base64
+import random
 import ast
 
+# Django 기본 기능
+from django.shortcuts import render, get_object_or_404
 
+# Django ORM 기능
+from django.db.models import Sum, Count, F, FloatField, Window
+from django.db.models.functions import Cast, RowNumber
+
+# 데이터 분석 / 시각화 라이브러리
+import pandas as pd
+import plotly.express as px
+import plotly.io as pio
+import plotly.graph_objects as go
+from wordcloud import WordCloud
+
+# 프로젝트 내부 모듈
+from .models import *
+from . import visualize
+from .models import Performance
 
 
 # Create your views here.
@@ -161,3 +171,220 @@ def index(request):
             'top_genre' : genre_name
         }   
     )
+    
+    
+    
+    
+    
+# ==================================================
+# 스트리밍 플랫폼 관련 분석 및 시각화 뷰
+# ==================================================
+
+# OTT 대표 색상
+OTT_COLORS = {
+    'Netflix': '#E50914',
+    'Disney+': '#01147C',
+    'Hulu': '#1CE783',
+    'Amazon Prime': '#1399FF',
+    'Apple TV+': '#000000',
+    'HBO Max': '#9E86FF',
+    'YouTube': '#FF0000',
+    'Peacock': '#F5003A',
+    'Paramount+': '#E50914',
+    'Discovery+': '#FF6600'
+}
+# 워드클라우드 색상 함수
+def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    if word in OTT_COLORS:
+        return OTT_COLORS[word]
+    r = random.randint(50, 200)
+    g = random.randint(50, 200)
+    b = random.randint(50, 200)
+    return f"rgb({r},{g},{b})"
+
+
+# Plotly Bar chart
+def generate_bar_chart(df, title, xlabel, ylabel):
+    fig = px.bar(
+        df,
+        x='OTT',
+        y='Ratio',
+        color='OTT',
+        color_discrete_map=OTT_COLORS,
+        title=title,
+        hover_data={
+            'Ratio': ':.2f',
+            'Count': True,
+            'OTT': False
+        }
+    )
+    fig.update_layout(
+        xaxis_title=xlabel,
+        yaxis_title=ylabel,
+        title_x=0.5,
+        template='plotly_white',
+        autosize=True,
+        margin=dict(l=40, r=40, t=60, b=80),
+        legend=dict(
+            title_text="",
+            orientation='h',
+            x=0.5,
+            y=-0.3,
+            xanchor="center",
+            yanchor="top"
+        )
+    )
+    return pio.to_html(fig, full_html=False, include_plotlyjs='cdn', config={'responsive': True})
+
+# WordCloud
+def generate_wordcloud(freq_dict):
+    wc = WordCloud(
+        width=800,
+        height=500,
+        background_color='white',
+        max_words=30,
+        color_func=color_func,
+        relative_scaling=0.5
+    ).generate_from_frequencies(freq_dict)
+
+    buffer = BytesIO()
+    wc.to_image().save(buffer, format='PNG')
+    encoded = base64.b64encode(buffer.getvalue()).decode()
+
+    fig = go.Figure(go.Image(source='data:image/png;base64,' + encoded))
+    fig.update_layout(
+        margin=dict(l=0, r=0, t=0, b=0),
+        autosize=True,
+        xaxis=dict(visible=False),
+        yaxis=dict(visible=False)
+    )
+    return pio.to_html(fig, full_html=False, config={'responsive': True})
+
+# 연도+상/하반기 라벨 변환
+def half_year_label(half_year):
+    year, half = half_year.split("-")
+    if half == "1":
+        return f"{year}년 상반기"
+    elif half == "2":
+        return f"{year}년 하반기"
+    return half_year
+
+# OTT 플랫폼 분석 대시보드 뷰
+def ottplatformTrend(request):
+    performances = Performance.objects.all()
+    data_list = []
+
+    for performance in performances:
+        program = performance.program   # 여기서 매번 쿼리 발생
+        for streaming in program.streamings.all():  # 여기서도 매번 쿼리 발생
+            data_list.append({
+                'half_year': performance.half_year,
+                'ott': streaming.ott,
+                'program_id': program.id,
+                'views': performance.views,
+                'country': program.country
+            })
+
+    df = pd.DataFrame(data_list)
+
+    if df.empty:
+        return render(request, 'backends/ottplatform.html', {
+            'images_by_half': {},
+            'title': 'OTT 시장 분석 대시보드 (데이터 없음)',
+            'first_half': None
+        })
+
+    images_by_half = {}
+
+    for half in sorted(df['half_year'].unique()):
+        df_half = df[df['half_year'] == half]
+        label = half_year_label(half)
+
+        # OTT 별 보유 작품 수, 비율
+        ott_program_count = df_half.groupby('ott')['program_id'].nunique()
+        ott_program_ratio = ((ott_program_count / 300) * 100)
+        df_cnt_rat = pd.DataFrame({
+            'OTT': ott_program_count.index,
+            'Count': ott_program_count.values,
+            'Ratio': ott_program_ratio.values
+        })
+        df_top10 = df_cnt_rat.sort_values(by='Ratio', ascending=False).head(10)
+
+        # 인기 작품 지수
+        grouped = df_half.groupby('ott').agg(
+            total_views=('views', 'sum'),
+            program_count=('program_id', 'nunique')
+        ).reset_index()
+        grouped['view_index'] = (
+            (grouped['total_views'] / grouped['program_count']) * (grouped['program_count'] / 300)
+        )
+
+        # 1. 바 차트
+        bar_html = generate_bar_chart(
+            df_top10,
+            f'{label} OTT별 작품 점유율 Top 10',
+            'OTT 플랫폼', '점유율(%)'
+        )
+
+        # 2. 워드클라우드
+        wc_html = generate_wordcloud(ott_program_count.to_dict())
+
+        # 3. 공급 대비 히트율 분석
+        supply = df_half.groupby('ott')['program_id'].nunique().reset_index(name='supply')
+
+        # 히트작 기준: views 상위 20%
+        # threshold = df_half['views'].quantile(0.8)
+        # hits = (
+        #     df_half[df_half['views'] >= threshold]
+        #     .groupby('ott')['program_id']
+        #     .nunique()
+        #     .reset_index(name='hits')
+        # )
+
+        # result = supply.merge(hits, on='ott', how='left').fillna(0)
+        # result['hit_ratio'] = (result['hits'] / result['supply']) * 100
+
+        # fig = go.Figure()
+        # fig.add_trace(go.Bar(x=result['ott'], y=result['supply'], name="공급량"))
+        # fig.add_trace(go.Bar(x=result['ott'], y=result['hits'], name="히트작"))
+        # fig.add_trace(go.Scatter(
+        #     x=result['ott'], y=result['hit_ratio'],
+        #     mode='lines+markers', name="히트율 (%)", yaxis="y2"
+        # ))
+
+        # fig.update_layout(
+        #     title=f"{label} - OTT별 공급 대비 히트율",
+        #     yaxis=dict(title="작품 수"),
+        #     yaxis2=dict(title="히트율 (%)", overlaying="y", side="right"),
+        #     barmode='group',
+        #     title_x=0.5
+        # )
+
+        # hit_chart_html = pio.to_html(fig, full_html=False, include_plotlyjs='cdn', config={'responsive': True})
+
+        images_by_half[half] = {
+            "label": label,
+            "charts": [
+                {
+                    'title': f'{label} - OTT별 보유 작품 비율 (Top 10)',
+                    'desc': 'Top 10 OTT 비율 막대 차트',
+                    'img': bar_html
+                },
+                {
+                    'title': f'{label} - OTT 워드클라우드',
+                    'desc': '전체 OTT 워드클라우드 (보유작 기준)',
+                    'img': wc_html
+                },
+                # {
+                #     'title': f'{label} - OTT 공급 대비 히트율',
+                #     'desc': '공급량 대비 실제 인기 있는 작품 비율을 나타냅니다.',
+                #     'img': hit_chart_html
+                # }
+            ]
+        }
+
+    return render(request, 'backends/ottplatform.html', {
+        'images_by_half': images_by_half,
+        'title': 'OTT 플랫폼 시장 분석',
+        'first_half': next(iter(images_by_half.keys()), None)
+    })
