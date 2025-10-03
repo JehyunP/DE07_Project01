@@ -410,7 +410,7 @@ def rating_views(request):
     top_programs = programs_by_rating.get(top_rating, [])
 
     fig = px.bar(data, x='IMDb_rating', y='avg_views', title='평점 별 평균 조회수')
-    fig.update_layout(title_x=0.5, autosize=True, height=800, width=1100, margin=dict(t=50, b=50, l=50, r=50))
+    fig.update_layout(title_x=0.5, autosize=True, height=750, width=800, margin=dict(t=50, b=50, l=50, r=50))
     fig.update_yaxes(range=[max_avg_views*0.6, max_avg_views*1.1], title='평균 시청수')
     fig.update_xaxes(title='IMDb 평점')
 
