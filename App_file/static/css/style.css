@@ -143,57 +143,147 @@ footer a:hover {
 
 /* 전체 배경 */
 .main-body {
-    background-color: #121212; /* 다크 모드 느낌 */
+    background-color: #121212; /* 다크 모드 */
     color: #fff;
-    padding: 20px 0;
+    padding: 0 0 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+.section-heading {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 15px;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.6);
 }
 
-/* Top Section */
+.top-section {
+    background-image: url("../certain.png"); /* 경로는 static 경로에 맞게 조정 */
+    background-size: cover;
+    background-position: center;
+    height: 500px;
+    border-radius: 20px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 커튼 위 타이틀 */
+.top-title-banner {
+    position: absolute;
+    top: 30px;                /* 상단 여백 */
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 2rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.7);  /* 어두운 배경에서도 잘 보이도록 그림자 */
+    background: rgba(0,0,0,0.4);  /* 반투명 배경 */
+    padding: 8px 20px;
+    border-radius: 10px;
+}
+
+/* 카드 공통 */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.4);
+}
+
+/* --------------------
+    Back Button Card
+-------------------- */
+.back-card {
+    position: fixed;
+    bottom: 300px;
+    left: 30px;
+    text-decoration: none;
+    z-index: 1000;
+}
+.back-card-body {
+    background: #1f2937;
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+}
+.back-card-body:hover {
+    background: #374151;
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+/* --------------------
+    Top Section
+-------------------- */
 .top-section {
     height: 500px;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    border-radius: 20px;
+    overflow: hidden; /* 둥근 모서리에 배경 맞추기 */
+}
+.top-info-card {
+    background: rgba(30, 30, 30, 0.85);
+    border-radius: 16px;
+    max-width: 350px;
+    color: #fff;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+    text-align: center;
+}
+.top-info-card .card-body {
+    padding: 20px 20px 10px; /* 하단 여백 줄임 */
 }
 
-.top-overlay {
-    background: rgba(0, 0, 0, 0.6);
-    padding: 30px;
-    border-radius: 12px;
-}
-
+/* 포스터 */
 .top-poster {
-    width: 220px;
+    width: 240px; /* 기존보다 살짝 크게 */
     border-radius: 12px;
     margin-bottom: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.top-poster:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(0,0,0,0.8);
 }
 
+/* 제목 & 장르 */
 .top-title {
-    font-size: 2rem;
+    font-size: 1.8rem;
     font-weight: bold;
+    margin: 10px 0 5px;
 }
-
 .top-genre {
     font-size: 1.2rem;
-    color: #bbb;
+    font-weight: 500;
+    color: darkgray;
+    margin-bottom: 0; /* 밑 여백 제거 */
 }
 
-/* Content Section */
+/* --------------------
+    Content Section
+-------------------- */
 .content-section {
     margin: 40px 0;
 }
-
-/* Content Card */
 .content-card {
     background: #1e1e1e;
     color: #fff;
-    border: none;
-    border-radius: 12px;
     padding: 15px;
-
 }
-
 .content-card .card-header {
     font-size: 1.2rem;
     font-weight: bold;
@@ -203,9 +293,11 @@ footer a:hover {
     color: white;
 }
 
-/* Poster */
+/* 포스터 (작은 썸네일) */
 .poster-sm {
-    width: 80px;
+    width: 100%;
+    height: 240px;             /* 원하는 높이 */
+    object-fit: cover;         /* 비율 유지 + 꽉 채움 */
     border-radius: 8px;
     transition: transform 0.2s ease;
 }
@@ -219,3 +311,24 @@ footer a:hover {
     margin: 10px;
 }
 
+
+/* 더 알아보기 버튼 */
+.btn-more {
+    display: inline-block !important;
+    background: linear-gradient(135deg, #374151, #1f2937) !important; /* 다크 그라데이션 */
+    color: #f3f4f6;   /* 밝은 회색 글자 */
+    font-size: 0.9rem;
+    font-weight: bold;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.25s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.25);
+}
+
+.btn-more:hover {
+    background: linear-gradient(135deg, #4b5563, #374151); /* hover 시 조금 더 밝게 */
+    color: white;
+    transform: translateY(-2px) scale(1.03);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.35);
+}

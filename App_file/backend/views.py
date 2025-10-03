@@ -42,7 +42,7 @@ def detail(request, program_id):
     return render(request, "backends/detail.html", context)
 
 
-def genreTrend(request):
+def setGenreIndex():
     qs = (
         Performance.objects.
         values('half_year', 'program__genre__name')
@@ -54,19 +54,42 @@ def genreTrend(request):
     )
 
     df = pd.DataFrame(qs)
-    
     df.rename(columns = {'program__genre__name' : 'genre'}, inplace=True)
+
     df['view_index'] = (df['total_views'] / df['program_count']) * (df['program_count'] / 300)
     df['view_rank'] = df.groupby('half_year')['view_index'].rank(
         method='dense', ascending=False
     )
-
     df['hour_index'] = (df['total_hours'] / df['program_count']) * (df['program_count'] / 300)
     df['hour_rank'] = df.groupby('half_year')['hour_index'].rank(
         method='dense', ascending=False
     )
 
-    chart_html = visualize.rank_half_year_plot(df)
+    # ---- 프로그램 상세를 위한 별도 쿼리 ----
+    qs_raw = Performance.objects.values(
+        'id',
+        'half_year',
+        'views',
+        'hours',
+        'program__id',
+        'program__title',
+        'program__poster',
+        'program__genre__name'
+    )
+    df_raw = pd.DataFrame(qs_raw)
+    df_raw.rename(columns={
+        'program__id': 'program_id',
+        'program__title': 'title',
+        'program__poster': 'poster',
+        'program__genre__name': 'genre'
+    }, inplace=True)
+    df_all = df.merge(df_raw, on=['half_year', 'genre'], how='left')
+
+    return df, df_all
+
+
+def genreTrend(request):
+    chart_html = visualize.rank_half_year_plot(setGenreIndex()[0])
 
 
     return render(
@@ -105,4 +128,36 @@ def genreDetail(request):
 
 
 def index(request):
-    return render(request, 'backends/index.html')
+    qs = (
+        Performance.objects
+        .filter(half_year = '2025-1')
+        .select_related('program')
+        .order_by('-views')[0]
+    )
+
+    poster = qs.program.poster
+    df = setGenreIndex()[1]
+    top_genre_row = (
+        df[df['half_year'] == '2025-1']
+        .sort_values(by='view_rank')
+        .iloc[0]
+    )
+    genre_name = top_genre_row['genre']
+
+    # 2. 해당 장르 & 2025-1의 프로그램 중 views 상위 5개
+    genre_top5 = (
+        df[(df['half_year'] == '2025-1') & (df['genre'] == genre_name)]
+        .sort_values(by='views', ascending=False)
+        .head(5)
+    )
+    genre_top5_list = genre_top5[['program_id', 'title', 'poster', 'views']].to_dict(orient='records')
+    
+
+    return render (
+        request, 'backends/index.html', {
+            'poster' : poster, 
+            'top_program' : qs.program,
+            'genre_top5' : genre_top5_list,
+            'top_genre' : genre_name
+        }   
+    )
