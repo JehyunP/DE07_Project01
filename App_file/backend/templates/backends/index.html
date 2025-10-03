@@ -4,28 +4,53 @@
 {% block title %}OTT 분석{% endblock %}
 
 {% block content %}
-<div class="main-body">
-
+<div class="main-body" style="padding:4%;">
     <!-- Top Section -->
-    <section class="top-section" 
-        style="background-image: url('{% static "certain.png" %}');
-            background-size: cover;
-            background-position: center;">
-        <div class="top-overlay text-center">
-            <img src="{{ top_program.poster }}" alt="{{ top_program.title }}" class="top-poster">
-            <h2 class="top-title">{{ top_program.title }}</h2>
-            <p class="top-genre">{{ top_program.genre }}</p>
+    <section class="content-section container">
+
+        <!-- 섹션 제목 -->
+        <h2 class="section-heading text-center">2025년 상반기 1위 작품</h2>
+
+        <!-- 커튼 + 카드 -->
+        <div class="top-section">
+            <div class="top-overlay text-center">
+                <a href="{% url 'backends:detail' top_program.id %}" target="_blank" class="text-decoration-none">
+                    <div class="card top-info-card mx-auto" style="cursor:pointer;">
+                        <div class="card-body">
+                            <img src="{{ poster }}" alt="{{ top_program.title }}" class="top-poster">
+                            <h2 class="top-title">{{ top_program.title }}</h2>
+                            <p class="top-genre">{{ top_program.genre }}</p>
+                        </div>
+                    </div>
+</a>
+            </div>
         </div>
     </section>
 
     <!-- 1. 장르 트렌드 변화 -->
     <section class="content-section container">
         <div class="card shadow content-card">
-            <div class="card-header">장르 트렌드 변화</div>
-            <div class="card-body d-flex justify-content-center flex-wrap gap-3">
-                {% for program in trend_program %}
-                    <img src="{{ program.poster }}" class="poster-sm" alt="{{ program.title }}">
+            <div class="card-header">2025년 상반기 Top 장르: {{ top_genre }}</div>
+            <div class="card-body d-flex justify-content-center flex-wrap gap-4">
+
+                {% for program in genre_top5 %}
+                    <a href="{% url 'backends:detail' program.program_id %}" 
+                    target="_blank" 
+                    class="text-decoration-none">
+                        <div class="card" style="width: 180px; cursor:pointer;">
+                            <img src="{{ program.poster }}" class="card-img-top poster-sm" alt="{{ program.title }}">
+                            <div class="card-body text-center">
+                                <h6 class="card-title">{{ program.title }}</h6>
+                            </div>
+                        </div>
+                    </a>
                 {% endfor %}
+            </div>
+            <!-- 카드 오른쪽 아래 버튼 -->
+            <div class="card-footer text-end">
+                <a href="{% url 'backends:genreTrend' %}" class="btn-more">
+                    더 알아보기 →
+                </a>
             </div>
         </div>
     </section>
@@ -43,7 +68,7 @@
     </section>
 
     <!-- 3. 평점 vs 조회수 -->
-    <section class="content-section container">
+    <section class="content-section container" onclick="location.href='{% url 'backends:rating_views' %}'" style="cursor: pointer;">
         <div class="card shadow content-card">
             <div class="card-header">평점 vs 조회수</div>
             <div class="card-body">
@@ -54,6 +79,7 @@
 
     <!-- 4. OTT별 독점률 -->
     <section class="content-section container">
+        <a href="{% url 'backends:ottplatformTrend' %}" style="text-decoration:none; color:inherit; display:block;">
         <div class="card shadow content-card">
             <div class="card-header">OTT 독점률</div>
             <div class="card-body d-flex justify-content-around align-items-center flex-wrap">
@@ -62,7 +88,13 @@
                 <img src="{% static 'logos/wavve.png' %}" alt="Wavve" class="ott-logo"> -->
             </div>
         </div>
+        </a>
     </section>
 
 </div>
+
+
+
+
+
 {% endblock %}
