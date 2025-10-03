@@ -8,19 +8,14 @@ from django.db.models import Window
 from django.shortcuts import render
 from .models import Performance
 from django.db.models import F
-<<<<<<< HEAD
+from . import visualize
+import ast
+
 from django.views import generic
 from django.urls import reverse_lazy
 from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Count
 import json
-=======
-from . import visualize
-import ast
-
-
-
->>>>>>> 66e4cc1601c7ba2d44297f8126b0278416b6030c
 
 # Create your views here.
 def index(request):
@@ -32,50 +27,21 @@ def index(request):
 
 def detail(request, program_id):
     program = get_object_or_404(Program, pk=program_id)
-
-<<<<<<< HEAD
-'''
-def subgenreportion(request, genre_name):
-    genre = get_object_or_404(Genre, name=genre_name)
-
-    # 서브장르와 프로그램 개수 집계 후 내림차순 정렬
-    subgenres = (
-        SubGenre.objects.filter(genre=genre)
-        .annotate(program_count=Count("program"))
-        .order_by('-program_count')  # ← 내림차순 정렬
-    )
-
-    labels = [sg.name for sg in subgenres]
-    data = [sg.program_count for sg in subgenres]
+    performances = program.performances.all().order_by("-half_year")  
+    streamings = program.streamings.all()  
+    directors = program.person_roles.filter(role__iexact="director")
+    actors = program.person_roles.filter(role__iexact="starring")
+    producers = program.person_roles.filter(role__iexact="producer")
 
     context = {
-        "genre_name": genre.name,
-        "labels": json.dumps(labels, ensure_ascii=False),
-        "data": json.dumps(data),
+        "program": program,
+        "performances": performances,
+        "streamings": streamings,
+        "directors": directors,
+        "actors": actors,
+        "producers": producers,
     }
-    return render(request, "backends/subgenreportion.html", context)
-
-def genreportion(request, half_year):
-    # 1. 특정 half_year 기준으로 Performance에서 Program-Genre 카운트
-    data = (
-        Performance.objects.filter(half_year=half_year)
-        .values("program__genre__name")
-        .annotate(count=Count("program__id"))
-        .order_by("-count")
-    )
-
-    # 2. labels / data 리스트 생성
-    labels = [item["program__genre__name"] for item in data]
-    counts = [item["count"] for item in data]
-
-    # 3. context에 JSON 직렬화하여 넘기기
-    context = {
-        "half_year": half_year,
-        "labels": json.dumps(labels, ensure_ascii=False),
-        "data": json.dumps(counts),
-    }
-    return render(request, "backends/genreportion.html", context)
-'''
+    return render(request, "backends/detail.html", context)
 
 def genre_distribution(request, half_year):
     data = (
@@ -138,23 +104,6 @@ def subgenre_programs(request, subgenre_id, half_year):
         "programs": programs_with_rank,
         "half_year": half_year,
     })
-=======
-    performances = program.performances.all().order_by("-half_year")  
-    streamings = program.streamings.all()  
-    directors = program.person_roles.filter(role__iexact="director")
-    actors = program.person_roles.filter(role__iexact="starring")
-    producers = program.person_roles.filter(role__iexact="producer")
-
-    context = {
-        "program": program,
-        "performances": performances,
-        "streamings": streamings,
-        "directors": directors,
-        "actors": actors,
-        "producers": producers,
-    }
-    return render(request, "backends/detail.html", context)
-
 
 def genreTrend(request):
     qs = (
@@ -220,4 +169,3 @@ def genreDetail(request):
 
 def index(request):
     return render(request, 'backends/index.html')
->>>>>>> 66e4cc1601c7ba2d44297f8126b0278416b6030c
