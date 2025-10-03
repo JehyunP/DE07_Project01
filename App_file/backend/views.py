@@ -65,9 +65,13 @@ def genre_distribution(request, half_year):
     labels = [item["program__genre__name"] for item in data]
     ids = [item["program__genre__id"] for item in data]
     counts = [item["count"] for item in data]
+    year, half = half_year.split("-")
+    half_kor = "상반기" if half == "1" else "하반기"
+    half_year_display = f"{year}년 {half_kor}"
 
     context = {
         "half_year": half_year,
+        "half_year_display": half_year_display,
         "labels": json.dumps(labels, ensure_ascii=False),
         "ids": json.dumps(ids),
         "data": json.dumps(counts),
@@ -111,10 +115,15 @@ def subgenre_programs(request, subgenre_id, half_year):
                 "views": f"{perf.views:,}",
             })
 
+    year, half = half_year.split("-")
+    half_kor = "상반기" if half == "1" else "하반기"
+    half_year_display = f"{year}년 {half_kor}"
+
     return render(request, "backends/subgenre_programs.html", {
         "subgenre": subgenre,
         "programs": programs_with_rank,
         "half_year": half_year,
+        "half_year_display": half_year_display,
     })
 
 def setGenreIndex():
