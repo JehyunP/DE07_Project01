@@ -2,9 +2,11 @@
     Default Setting
 -------------------- */
 body {
+    background-color: #f4f6f9;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
     margin: 0;
-    font-family: Arial, sans-serif;
-    
+    padding: 0;
 }
 
 /* --------------------
@@ -14,21 +16,32 @@ header {
     display: flex;                 
     justify-content: space-between;
     align-items: center;           
-    padding: 10px 20px;
-    background-color: #f8f8f8;
+    padding: 15px 30px;
+    background-color: #2c3e50;
     border-bottom: 1px solid #ddd;
 }
 
 header h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: 1.8rem;
+    font-weight: bold;
+}
+
+header h1 a {
+    text-decoration: none;  
+    color: #ecf0f1;     
 }
 
 header nav a {
     margin-left: 15px;
     text-decoration: none;
-    color: #333;
+    color: #ecf0f1;
     font-weight: bold;
+    transition: color 0.3s;
+}
+
+header nav a:hover {
+    color: #1abc9c;
 }
 
 /* --------------------
@@ -38,15 +51,171 @@ main {
     padding: 20px;
     min-height: 70vh; 
 }
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.card-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #34495e;
+    margin-bottom: 15px;
+}
 
 /* --------------------
     Footer
 -------------------- */
 footer {
-    text-align: center;   
+    text-align: center;
+    background-color: #2c3e50;
+    color: #ecf0f1;
     padding: 20px;
-    background-color: #f8f8f8;
-    border-top: 1px solid #ddd;
     font-size: 0.9rem;
-    color: #555;
+    margin-top: 50px;
 }
+footer a {
+    color: #1abc9c;
+    text-decoration: none;
+}
+footer a:hover {
+    text-decoration: underline;
+}
+
+
+
+/*
+    Genre_ranking_trend
+*/
+
+/* 카드 스타일 */
+.chart-card {
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    border-radius: 12px;
+    margin-bottom: 30px;
+    padding: 10px;
+    background-color: #fff;
+}
+
+/* Plotly 차트 크기 */
+.js-plotly-plot {
+    width: 100% !important;
+    height: 600px !important;  /* 필요하면 조절 가능 */
+}
+
+
+
+/*
+    Genre Detail
+*/
+.back-card {
+    position: fixed;
+    bottom: 300px;  
+    left: 30px;     
+    text-decoration: none;
+    z-index: 1000;
+}
+
+.back-card-body {
+    background: #1f2937;   
+    border-radius: 12px;
+    padding: 12px 20px;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    transition: all 0.2s ease-in-out;
+}
+
+.back-card-body:hover {
+    background: #374151;  
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+
+/*
+    Index.html
+*/
+
+/* 전체 배경 */
+.main-body {
+    background-color: #121212; /* 다크 모드 느낌 */
+    color: #fff;
+    padding: 20px 0;
+}
+
+/* Top Section */
+.top-section {
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.top-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.top-poster {
+    width: 220px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.top-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.top-genre {
+    font-size: 1.2rem;
+    color: #bbb;
+}
+
+/* Content Section */
+.content-section {
+    margin: 40px 0;
+}
+
+/* Content Card */
+.content-card {
+    background: #1e1e1e;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+
+}
+
+.content-card .card-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #333;
+    border-bottom: none;
+    text-align: center;
+    color: white;
+}
+
+/* Poster */
+.poster-sm {
+    width: 80px;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+.poster-sm:hover {
+    transform: scale(1.05);
+}
+
+/* OTT 로고 */
+.ott-logo {
+    width: 60px;
+    margin: 10px;
+}
+

@@ -91,7 +91,7 @@ class Command(BaseCommand):
                     # 4) 스트리밍
                     streaming_val = clean_str(row.get("Streaming"))
                     if streaming_val:
-                        cleaned_val = streaming_val.strip("[]").replace("'", "")
+                        cleaned_val = streaming_val.strip("[]").replace("'", "").replace('(', '').replace(')', '')
                         for ott in cleaned_val.split(","):
                             ott_name = ott.strip()
                             if ott_name:

@@ -6,44 +6,48 @@
         <title>{% block title %} OTT Program Dashboard {% endblock %}</title>
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+
+        <!-- ✅ Bootstrap CSS CDN -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+        <!-- ✅ Bootstrap JS (팝업, 모달, 드롭다운 같은 기능이 필요하다면) -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </head>
+
 
     <body>
         <header>
-            <h1>OTT Dashboard</h1>
+            <h1> <a href="{% url 'backends:index' %}">OTT Dashboard</a></h1>
             <nav>
-                <a href="{% url 'backends:index' %}">홈</a> |
-            <a href="/admin/">관리자</a>
+                <a href="/admin/">관리자</a>
             </nav>
         </header>
 
-        <main>
+        <main {
+            padding-left: 10%;
+            padding-right: 10%;
+        }>
             {% block content %} {% endblock %}
         </main>
 
         <footer>
         <p id="project_team_no"><b>DE07 Quad Core</b></p>
-        <p><b>Team Members</b></p>
         <p>
             박제현 - parkjehyun0131@gmail.com |
             박채은 - pea1101ce@gmail.com |
             어선아 - aneoseo14@gmail.com |
             천준규 - june017323@gmail.com
         </p>
-
-        <p>Data Source: <a href="https://flixpatrol.com/" target="_blank">FlixPatrol</a></p>
         <p><strong>Project Repository:</strong> 
         <a href="https://github.com/JehyunP/DE07_Project01" target="_blank">GitHub</a></p>
 
-        <p>Powered by Django · Plotly · Bootstrap</p>
+        <p>Data Source: <a href="https://flixpatrol.com/" target="_blank">FlixPatrol</a> &nbsp; | &nbsp; Powered by Django · Plotly · Bootstrap</p>
 
         <p>© 2025 OTT Trend Analysis Project.  
         학습 목적의 데이터 시각화 프로젝트입니다.</p>
 
-        <p>Last Updated: 2025-10-01</p>
-    </footer>
+        <p>Last Updated: 2025-10-10</p>
+        </footer>
+        {% block extra_scripts %}{% endblock %}
     </body>
-
-
-    
 </html>

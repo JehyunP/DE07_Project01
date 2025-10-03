@@ -1,0 +1,35 @@
+{% extends 'backends/base_template.html' %}
+{% block title %}반기별 인기 장르{% endblock %}
+
+
+{% block content %}
+<div class="container mt-4">
+<div class="card chart-card">
+    <div class="card-body">
+        {{ chart_drop|safe }}
+    </div>
+</div>
+</div>
+
+<!-- 카드형 뒤로가기 버튼 -->
+<a href="{% url 'backends:index' %}" class="back-card">
+    <div class="back-card-body">
+        ← 뒤로가기
+    </div>
+</a>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var plot = document.querySelector(".plotly-graph-div");
+        if (!plot) return;
+
+        plot.on('plotly_click', function (data) {
+        var genre = data.points[0].data.name;
+        var half_year = data.points[0].x;
+        var mode = data.points[0].data.customdata ? data.points[0].data.customdata[0] : "views"; 
+
+        window.location.href = `/genreDetail/?genre=${genre}&half_year=${half_year}&mode=${mode}`;
+        });
+    });
+    </script>
+{% endblock %}
