@@ -66,7 +66,7 @@
     </section>
 
     <!-- 3. 평점 vs 조회수 -->
-    <section class="content-section container">
+    <section class="content-section container" onclick="location.href='{% url 'backends:rating_views' %}'" style="cursor: pointer;">
         <div class="card shadow content-card">
             <div class="card-header">평점 vs 조회수</div>
             <div class="card-body">

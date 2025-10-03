@@ -8,8 +8,8 @@ import ast
 from django.shortcuts import render, get_object_or_404
 
 # Django ORM 기능
-from django.db.models import Sum, Count, F, FloatField, Window
-from django.db.models.functions import Cast, RowNumber
+from django.db.models import Sum, Count, F, FloatField, Window, Avg
+from django.db.models.functions import Cast, RowNumber, Floor
 
 # 데이터 분석 / 시각화 라이브러리
 import pandas as pd
@@ -388,3 +388,32 @@ def ottplatformTrend(request):
         'title': 'OTT 플랫폼 시장 분석',
         'first_half': next(iter(images_by_half.keys()), None)
     })
+
+def rating_views(request):
+    data = Performance.objects.annotate(IMDb_rating=Floor('imdb')).values('IMDb_rating').annotate(avg_views=Avg('views')).order_by('IMDb_rating')
+    max_avg_views = data.order_by('-avg_views')[0].get('avg_views')
+    top_rating = int(max(data, key=lambda x: x['avg_views'])['IMDb_rating'])
+
+    programs_by_rating = {}
+    for rating in range(0, 11):
+        programs = (
+            Performance.objects
+            .annotate(int_rating=Floor('imdb'))
+            .filter(int_rating=rating)
+            .select_related('program')
+            .order_by('-views')
+            .values('program__title', 'views')
+        )[:16]
+
+        programs_by_rating[rating] = list(programs)
+    
+    top_programs = programs_by_rating.get(top_rating, [])
+
+    fig = px.bar(data, x='IMDb_rating', y='avg_views', title='평점 별 평균 조회수')
+    fig.update_layout(title_x=0.5, autosize=True, height=800, width=1100, margin=dict(t=50, b=50, l=50, r=50))
+    fig.update_yaxes(range=[max_avg_views*0.6, max_avg_views*1.1], title='평균 시청수')
+    fig.update_xaxes(title='IMDb 평점')
+
+    chart_html = fig.to_html(full_html=False)
+
+    return render(request, 'backends/rating_views.html', {'chart': chart_html, 'programs_by_rating':programs_by_rating, 'top_programs':top_programs, 'top_rating':top_rating})

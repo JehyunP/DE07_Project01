@@ -9,4 +9,6 @@ urlpatterns = [
     path('genreTrend/', views.genreTrend, name='genreTrend'),
     path('genreDetail/', views.genreDetail, name='genreDetail'),
     path('ottplatformTrend/', views.ottplatformTrend, name='ottplatformTrend'),
+    path('rating_views/', views.rating_views, name='rating_views'),
+
 ]
