@@ -1,0 +1,99 @@
+{% extends 'backends/base_template.html' %}
+{% block title %}장르 분포도{% endblock %}
+{% block content %}
+
+<div style="display: flex; gap: 40px;">
+  <!-- 왼쪽: 장르 분포 -->
+  <div style="flex: 1;">
+    <h3>{{ half_year }} 장르별 분포</h3>
+    <canvas id="genreChart"></canvas>
+  </div>
+
+  <!-- 오른쪽: 서브장르 분포 -->
+  <div style="flex: 1;">
+    <h3 id="subgenreTitle">서브장르 분포</h3>
+    <canvas id="subgenreChart"></canvas>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const genreLabels = {{ labels|safe }};
+    const genreData = {{ data|safe }};
+    const genreIds   = {{ ids|safe }};
+    const halfYear   = "{{ half_year }}";
+
+    const genreCtx = document.getElementById('genreChart').getContext('2d');
+    const subgenreCtx = document.getElementById('subgenreChart').getContext('2d');
+
+    // 랜덤 색상 배열 생성 함수
+    function generateRandomColors(count) {
+        return Array.from({ length: count }, () => getRandomColor());
+    }
+
+    function getRandomColor() {
+        const r = Math.floor(Math.random() * 255);
+        const g = Math.floor(Math.random() * 255);
+        const b = Math.floor(Math.random() * 255);
+        return `rgba(${r}, ${g}, ${b}, 0.6)`;
+    }
+
+    // 1. 장르 분포 차트
+    const genreChart = new Chart(genreCtx, {
+        type: 'pie',
+        data: {
+            labels: genreLabels,
+            datasets: [{
+                data: genreData,
+                backgroundColor: generateRandomColors(genreLabels.length)
+            }]
+        },
+        options: {
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const genreId = genreIds[index];
+                    const genreName = genreLabels[index];
+                    loadSubgenreChart(genreId, genreName);
+                }
+            }
+        }
+    });
+
+    // 2. 서브장르 차트 (빈 상태로 초기화)
+    let subgenreChart = new Chart(subgenreCtx, {
+        type: 'pie',
+        data: { labels: [], datasets: [{ data: [] }] },
+        options: { 
+            responsive: true, 
+            onClick: (e, elements) => {
+                if (elements.length > 0) {
+                    const index = elements[0].index;
+                    const subgenreId = subgenreChart.data.subgenreIds[index];
+
+                    // 해당 서브장르 프로그램 리스트 페이지로 이동
+                    window.location.href = `/subgenre/${subgenreId}/${halfYear}/`;
+                }
+            }
+        }
+    });
+
+    // 3. 서브장르 데이터를 불러와서 차트 업데이트
+    function loadSubgenreChart(genreId, genreName) {
+        fetch(`/api/subgenre/${genreId}/${halfYear}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("subgenreTitle").innerText = genreName + " 서브장르 분포";
+
+                const colors = generateRandomColors(genreLabels.length);
+
+                subgenreChart.data.labels = data.labels;
+                subgenreChart.data.datasets[0].data = data.data;
+                subgenreChart.data.datasets[0].backgroundColor = colors;
+                subgenreChart.data.subgenreIds = data.ids;
+                subgenreChart.update();
+            });
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends 'backends/base_template.html' %}
+{% block title %}장르 분포도{% endblock %}
+{% block content %}
+
+<h2>{{ subgenre.name }} 프로그램 목록 ({{ half_year }}, 시청뷰수 기준)</h2>
+
+<div style="display: flex; flex-wrap: wrap; gap: 20px;">
+  {% for item in programs %}
+    <div style="width: 160px; text-align: center; border: 1px solid #eee; padding: 10px; border-radius: 8px;">
+      <!-- 순위 -->
+      <p style="font-weight: bold; color: #e74c3c; margin: 0;">#{{ item.rank }}</p>
+
+      <!-- 포스터 -->
+      <img src="{{ item.program.poster }}" 
+           alt="{{ item.program.title }} 포스터" 
+           style="width: 100%; height: auto; border-radius: 6px;">
+
+      <!-- 제목 -->
+      <p style="margin-top: 8px; font-weight: bold;">{{ item.program.title }}</p>
+
+      <!-- 제작연도 -->
+      <p style="color: gray; font-size: 0.9em;">({{ item.program.release }})</p>
+
+      <!-- 조회수 -->
+      <p style="font-size: 0.85em; color: #2c3e50;">조회수: {{ item.views }}</p>
+    </div>
+  {% empty %}
+    <p>등록된 프로그램이 없습니다.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}
