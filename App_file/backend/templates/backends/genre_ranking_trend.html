@@ -6,10 +6,17 @@
 <div class="container mt-4">
 <div class="card chart-card">
     <div class="card-body">
-    {{ chart_drop|safe }}
+        {{ chart_drop|safe }}
     </div>
 </div>
 </div>
+
+<!-- 카드형 뒤로가기 버튼 -->
+<a href="{% url 'backends:index' %}" class="back-card">
+    <div class="back-card-body">
+        ← 뒤로가기
+    </div>
+</a>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {

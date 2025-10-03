@@ -105,12 +105,4 @@ def genreDetail(request):
 
 
 def index(request):
-    program_lists = Program.objects.all()[:5]
-    context = {'Program' : program_lists}
-    top_program = Performance.objects.filter(rank=1, half_year='2025-1').select_related('program').first().program
-    total_program_count = Program.objects.count()
-    trend_program_genre_name = Performance.objects.values('program__genre__name').annotate(views_total=Sum('views'), genre_program_count=Count('program', distinct=True), avg_views=Cast(Sum('views'), FloatField()) / Count('program', distinct=True), weight=Cast(Count('program', distinct=True), FloatField()) / total_program_count, score=(Cast(Sum('views'), FloatField()) / Count('program', distinct=True)) * (Cast(Count('program', distinct=True), FloatField()) / total_program_count)).order_by('-score')[0].get('program__genre__name')
-    trend_program = Program.objects.filter(genre__name=trend_program_genre_name).order_by('-performances__views')[:5]
-    country_program = (Performance.objects.annotate(country=F('program__country'), row_number=Window(expression=RowNumber(), partition_by=[F('program__country')], order_by=F('views').desc())).filter(row_number__lte=1).select_related('program'))[:3]
-    genre_program = (Performance.objects.annotate(country=F('program__genre'), row_number=Window(expression=RowNumber(), partition_by=[F('program__genre')], order_by=F('views').desc())).filter(row_number__lte=1).select_related('program'))[:3]
-    return render(request, 'backends/index.html', {'context':context, 'top_program': top_program, 'trend_program_genre_name':trend_program_genre_name, 'trend_program':trend_program, 'country_program':country_program, 'genre_program':genre_program})
+    return render(request, 'backends/index.html')

@@ -138,5 +138,84 @@ footer a:hover {
 
 
 /*
-    Detail
+    Index.html
 */
+
+/* 전체 배경 */
+.main-body {
+    background-color: #121212; /* 다크 모드 느낌 */
+    color: #fff;
+    padding: 20px 0;
+}
+
+/* Top Section */
+.top-section {
+    height: 500px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.top-overlay {
+    background: rgba(0, 0, 0, 0.6);
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.top-poster {
+    width: 220px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+}
+
+.top-title {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.top-genre {
+    font-size: 1.2rem;
+    color: #bbb;
+}
+
+/* Content Section */
+.content-section {
+    margin: 40px 0;
+}
+
+/* Content Card */
+.content-card {
+    background: #1e1e1e;
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 15px;
+
+}
+
+.content-card .card-header {
+    font-size: 1.2rem;
+    font-weight: bold;
+    background: #333;
+    border-bottom: none;
+    text-align: center;
+    color: white;
+}
+
+/* Poster */
+.poster-sm {
+    width: 80px;
+    border-radius: 8px;
+    transition: transform 0.2s ease;
+}
+.poster-sm:hover {
+    transform: scale(1.05);
+}
+
+/* OTT 로고 */
+.ott-logo {
+    width: 60px;
+    margin: 10px;
+}
+
