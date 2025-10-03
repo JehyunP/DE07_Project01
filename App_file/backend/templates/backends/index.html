@@ -57,12 +57,14 @@
 
     <!-- 2. 서브 장르 분포 -->
     <section class="content-section container">
-        <div class="card shadow content-card">
-            <div class="card-header">서브 장르 분포</div>
-            <div class="card-body">
-                <div id="subgenre-piechart" style="height:300px;"> </div>
+        <a href="{% url 'backends:genre_distribution' '2025-1' %}" class="text-decoration-none text-dark">
+            <div class="card shadow content-card">
+                <div class="card-header">서브 장르 분포</div>
+                <div class="card-body">
+                    <div id="subgenre-piechart" style="height:300px;"></div>
+                </div>
             </div>
-        </div>
+        </a>
     </section>
 
     <!-- 3. 평점 vs 조회수 -->

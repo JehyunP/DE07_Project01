@@ -4,6 +4,12 @@ import base64
 import random
 import ast
 
+from django.views import generic
+from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Count
+import json
+
 # Django 기본 기능
 from django.shortcuts import render, get_object_or_404
 
@@ -23,7 +29,6 @@ from .models import *
 from . import visualize
 from .models import Performance
 
-
 # Create your views here.
 def index(request):
     program_lists = Program.objects.all()[:5]
@@ -34,7 +39,6 @@ def index(request):
 
 def detail(request, program_id):
     program = get_object_or_404(Program, pk=program_id)
-
     performances = program.performances.all().order_by("-half_year")  
     streamings = program.streamings.all()  
     directors = program.person_roles.filter(role__iexact="director")
@@ -51,6 +55,67 @@ def detail(request, program_id):
     }
     return render(request, "backends/detail.html", context)
 
+def genre_distribution(request, half_year):
+    data = (
+        Performance.objects.filter(half_year=half_year)
+        .values("program__genre__name", "program__genre__id")
+        .annotate(count=Count("program"))
+        .order_by("-count")
+    )
+    labels = [item["program__genre__name"] for item in data]
+    ids = [item["program__genre__id"] for item in data]
+    counts = [item["count"] for item in data]
+
+    context = {
+        "half_year": half_year,
+        "labels": json.dumps(labels, ensure_ascii=False),
+        "ids": json.dumps(ids),
+        "data": json.dumps(counts),
+    }
+    return render(request, "backends/genrensub.html", context)
+
+from django.http import JsonResponse
+
+def subgenre_distribution_api(request, genre_id, half_year):
+    data = (
+        Performance.objects.filter(half_year=half_year, program__genre__id=genre_id)
+        .values("program__sub_genre__id", "program__sub_genre__name")
+        .annotate(count=Count("program"))
+        .order_by("-count")
+    )
+
+    labels = [item["program__sub_genre__name"] or "기타" for item in data]
+    counts = [item["count"] for item in data]
+    ids = [item["program__sub_genre__id"] for item in data]
+
+    return JsonResponse({"labels": labels, "data": counts, "ids": ids})
+
+def subgenre_programs(request, subgenre_id, half_year):
+    subgenre = get_object_or_404(SubGenre, id=subgenre_id)
+
+    programs = (
+        Program.objects.filter(sub_genre=subgenre, performances__half_year=half_year)
+        .order_by("-performances__views")
+        .select_related("sub_genre")
+        .prefetch_related("performances")
+    )
+
+    # 순위 매기기
+    programs_with_rank = []
+    for idx, program in enumerate(programs, start=1):
+        perf = program.performances.filter(half_year=half_year).first()
+        if perf:
+            programs_with_rank.append({
+                "rank": idx,
+                "program": program,
+                "views": f"{perf.views:,}",
+            })
+
+    return render(request, "backends/subgenre_programs.html", {
+        "subgenre": subgenre,
+        "programs": programs_with_rank,
+        "half_year": half_year,
+    })
 
 def setGenreIndex():
     qs = (
@@ -417,3 +482,4 @@ def rating_views(request):
     chart_html = fig.to_html(full_html=False)
 
     return render(request, 'backends/rating_views.html', {'chart': chart_html, 'programs_by_rating':programs_by_rating, 'top_programs':top_programs, 'top_rating':top_rating})
+
