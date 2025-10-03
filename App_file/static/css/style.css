@@ -159,7 +159,7 @@ footer a:hover {
 }
 
 .top-section {
-    background-image: url("../certain.png"); /* 경로는 static 경로에 맞게 조정 */
+    background-image: url("../curtain.png"); /* 경로는 static 경로에 맞게 조정 */
     background-size: cover;
     background-position: center;
     height: 500px;

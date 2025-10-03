@@ -57,38 +57,30 @@
 
     <!-- 2. 서브 장르 분포 -->
     <section class="content-section container">
-        <a href="{% url 'backends:genre_distribution' '2025-1' %}" class="text-decoration-none text-dark">
-            <div class="card shadow content-card">
-                <div class="card-header">서브 장르 분포</div>
-                <div class="card-body">
-                    <div id="subgenre-piechart" style="height:300px;"></div>
-                </div>
-            </div>
-        </a>
+        <div class="card shadow content-card">
+            <!-- 카드 전체가 아니라 헤더만 남김 -->
+            <a href="{% url 'backends:genre_distribution' '2025-1' %}"
+                class="card-header text-decoration-none text-white d-block">
+                서브 장르 분포
+            </a>
+        </div>
     </section>
 
     <!-- 3. 평점 vs 조회수 -->
     <section class="content-section container" onclick="location.href='{% url 'backends:rating_views' %}'" style="cursor: pointer;">
         <div class="card shadow content-card">
             <div class="card-header">평점 vs 조회수</div>
-            <div class="card-body">
-                <div id="rating-views-scatter" style="height:300px;"></div>
-            </div>
         </div>
     </section>
 
     <!-- 4. OTT별 독점률 -->
     <section class="content-section container">
-        <a href="{% url 'backends:ottplatformTrend' %}" style="text-decoration:none; color:inherit; display:block;">
         <div class="card shadow content-card">
-            <div class="card-header">OTT 독점률</div>
-            <div class="card-body d-flex justify-content-around align-items-center flex-wrap">
-                <!-- <img src="{% static 'logos/netflix.png' %}" alt="Netflix" class="ott-logo">
-                <img src="{% static 'logos/disney.png' %}" alt="Disney+" class="ott-logo">
-                <img src="{% static 'logos/wavve.png' %}" alt="Wavve" class="ott-logo"> -->
-            </div>
+            <a href="{% url 'backends:ottplatformTrend' %}"
+            class="card-header text-decoration-none text-white d-block">
+                OTT 독점률
+            </a>
         </div>
-        </a>
     </section>
 
 </div>

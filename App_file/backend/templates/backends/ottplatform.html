@@ -71,6 +71,12 @@
 
 </div>
 
+<a href="{% url 'backends:index' %}" class="back-card">
+    <div class="back-card-body">
+        ← 뒤로가기
+    </div>
+</a>
+
 <script>
 function showHalf(half) {
     document.querySelectorAll(".half-container").forEach(div => div.style.display = "none");
