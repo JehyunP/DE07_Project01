@@ -11,6 +11,6 @@ urlpatterns = [
     path("subgenre/<int:subgenre_id>/<str:half_year>/", views.subgenre_programs, name="subgenre_programs"),
     path('genreTrend/', views.genreTrend, name='genreTrend'),
     path('genreDetail/', views.genreDetail, name='genreDetail'),
-    path('ottplatformTrend/', views.ottplatformTrend, name='ottplatformTrend'),
+    path('ottplatformRank/', views.ottplatformRank, name='ottplatformRank'),
     path('rating_views/', views.rating_views, name='rating_views'),
 ]
