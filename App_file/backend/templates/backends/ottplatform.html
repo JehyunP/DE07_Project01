@@ -4,96 +4,158 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block content %}
-<div style="background-color:#f5f7fa; padding:30px; border-radius:12px;">
+<style>
+/* 반기 전환 버튼 스타일 */
+.half-tab-container {
+    text-align: center;
+    margin-bottom: 25px;
+}
+.half-tab {
+    background-color: #ffffff;
+    border: 1px solid #d0d0d0;
+    border-radius: 20px;
+    padding: 10px 20px;
+    margin: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+.half-tab:hover {
+    background-color: #f0f0f0;
+}
+.half-tab.active {
+    background-color: #4e73df;
+    color: #fff;
+    border-color: #4e73df;
+    box-shadow: 0 4px 10px rgba(78,115,223,0.3);
+}
+/* 카드 스타일 */
+.chart-card {
+    background-color: white;
+    border-radius: 16px;
+    padding: 20px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+</style>
 
+<div style="background-color:#f5f7fa; padding:30px; border-radius:12px;">
+    <!-- 페이지 주제 -->
     <h1 style="text-align:center; font-size:2rem; margin-bottom:25px;">{{ title }}</h1>
 
     <!-- 반기 전환 버튼 -->
     <div class="half-tab-container">
-        {% for half, data in images_by_half.items %}
-        <button onclick="showHalf('{{ half }}')" class="half-tab">
-            {{ data.label }}
-        </button>
+        {% for half, data in results.items %}
+        <button onclick="showHalf('{{ half }}')" class="half-tab">{{ data.label }}</button>
         {% endfor %}
     </div>
 
-    <style>
-    .half-tab-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    }
-
-    .half-tab {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 25px;
-    background-color: #f1f3f5;
-    color: #333;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-    }
-
-    .half-tab:hover {
-    background-color: #007bff;
-    color: white;
-    }
-
-    .half-tab.active {
-    background-color: #0056b3;
-    color: white;
-    }
-    </style>
-
-    <!-- 반기별 컨테이너 -->
-    {% for half, data in images_by_half.items %}
+    {% for half, data in results.items %}
     <div id="half-{{ half }}" class="half-container" style="display:none;">
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(400px, 1fr)); gap:24px;">
+        <div style="display:flex; flex-direction:column; gap:30px;">
+
+            <!-- 워드클라우드 -->
             {% for item in data.charts %}
-            <div style="background-color:white; border-radius:16px; box-shadow:0 4px 12px rgba(0,0,0,0.1);
-                        padding:20px; transition:transform 0.3s; overflow:hidden;">
-                <h3 style="text-align:center; font-size:1.2rem; color:#333;">{{ item.title }}</h3>
-                <blockquote style="background-color:#f9fafb; border-left:5px solid #a0aec0;
-                                    padding:12px 18px; margin-top:15px; border-radius:6px;
-                                    font-size:0.95rem; color:#4a5568; line-height:1.5;">
-                    {{ item.desc }}
+            {% if "워드클라우드" in item.desc %}
+            <div class="chart-card">
+                <h3 style="text-align:center;">{{ item.title }}</h3>
+                <blockquote style="text-align:center; background:#f9f9f9; border-left:4px solid #ccc; padding:10px; font-size:0.95rem; color:#555; max-width:700px; margin:15px auto 0;">
+                    크롤링한 인기 작품에 대해 각 OTT 플랫폼이 보유한 작품 수에 비례하여 표현한 시각화 자료입니다.<br>
+                    글자가 클수록 보유한 인기 작품 수가 많음을 의미하며,<br>
+                    이를 통해 <b>콘텐츠 풀의 크기</b>를 직관적으로 비교할 수 있습니다.
                 </blockquote>
-                <div style="margin-top:10px; width:100%; height:100%; min-height:350px;">
+                <div style="margin-top:10px; width:100%; min-height:350px; display:flex; justify-content:center; align-items:center;">
                     {{ item.img|safe }}
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
+
+            <!-- 막대차트 -->
+            {% for item in data.charts %}
+            {% if "막대 차트" in item.desc %}
+            <div class="chart-card">
+                <h3 style="text-align:center;">{{ item.title }}</h3>
+                <blockquote style="text-align:center; background:#f9f9f9; border-left:4px solid #ccc; padding:10px; font-size:0.95rem; color:#555; max-width:700px; margin:15px auto 0;">
+                    크롤링한 인기 작품에 대해 각 OTT 플랫폼 별로 보유한 작품 비율을 나타내는 시각화 자료입니다.<br>
+                    상위 10개 플랫폼의 점유율을 비교하여 <b>시장 지배력이 어느 플랫폼에 집중되는지</b> 확인할 수 있습니다.<br>
+                </blockquote>
+                <div style="margin-top:10px; width:100%; min-height:350px; display:flex; justify-content:center; align-items:center;">
+                    {{ item.img|safe }}
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <!-- 인기작품 Top3 -->
+            <div class="chart-card">
+                <h3 style="margin-bottom:10px; text-align:center;">{{ data.label }} OTT별 인기 작품 Top3</h3>
+                <blockquote style="text-align:center; background:#f9f9f9; border-left:4px solid #ccc; padding:10px; font-size:0.95rem; color:#555; max-width:700px; margin:0 auto 20px;">
+                    각 OTT 플랫폼에서 해당 반기 동안 가장 많이 시청된 인기 작품 상위 3편을 보여줍니다.<br>
+                    <b>막대 그래프를 클릭</b>하면 해당 OTT 플랫폼의 Top3 작품이 아래에 나타납니다.<br>
+                    <b>* 단순 조회수 기준의 랭킹 *</b>
+                </blockquote>
+
+                {% for ott, programs in data.ott_top3.items %}
+                <div id="ott-{{ half }}-{{ ott|slugify }}" class="ott-top3" style="margin:30px auto; display:none; text-align:center;">
+                    <h5 style="margin-bottom:10px;">{{ ott }}</h5>
+                    <div style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap;">
+                        {% for p in programs %}
+                        <div style="width:150px; text-align:center;">
+                            <a href="{% url 'backends:detail' p.program_id %}" target="_blank">
+                                <img src="{{ p.poster }}" alt="{{ p.title }}"
+                                    style="width:100%; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.2);">
+                            </a>
+                            <p style="font-size:0.9rem; margin-top:5px;">{{ p.title }}</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
         </div>
     </div>
     {% endfor %}
-
 </div>
 
 <a href="{% url 'backends:index' %}" class="back-card">
-    <div class="back-card-body">
-        ← 뒤로가기
-    </div>
+    <div class="back-card-body">← 뒤로가기</div>
 </a>
 
 <script>
+// DOM id에서 쓸 수 있는 형태로 바꾸기
+function normalizeSlug(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+// 반기 설정
 function showHalf(half) {
     document.querySelectorAll(".half-container").forEach(div => div.style.display = "none");
-    document.getElementById("half-" + half).style.display = "block";
-
-    // 탭 전환 시 plotly 차트 리사이즈 강제 실행
-    setTimeout(() => {
-        window.dispatchEvent(new Event('resize'));
-    }, 100);
+    var current = document.getElementById("half-" + half);
+    current.style.display = "block";
 }
+// 막대 클릭 이벤트
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelectorAll(".half-container .js-plotly-plot").forEach(chart => {
+        chart.on("plotly_click", function(data) {
+            var halfId = chart.closest(".half-container").id.replace("half-", "");
+            var ott = data.points[0].x;
+            var ottId = "ott-" + halfId + "-" + normalizeSlug(ott);
 
-{% if first_half %}
-showHalf("{{ first_half }}");
-{% endif %}
+            document.querySelectorAll("#half-" + halfId + " .ott-top3")
+                    .forEach(div => div.style.display = "none");
 
-window.addEventListener("load", function() {
-    window.dispatchEvent(new Event('resize'));
+            var target = document.getElementById(ottId);
+            if (target) target.style.display = "block";
+        });
+    });
+    
+    // 초기 반기 설정
+    {% if first_half %}showHalf("{{ first_half }}");{% endif %}
 });
 </script>
 
