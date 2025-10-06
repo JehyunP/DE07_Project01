@@ -1,7 +1,7 @@
 {% extends 'backends/base_template.html' %}
 {% load static %}
 {% load humanize %}
-{% block title %}평점별 평균 조회수{% endblock %}
+{% block title %}평점별 평균 시청수{% endblock %}
 
 {% block content %}
 
@@ -15,9 +15,11 @@
             background-color: #f9f9f9;
         }
         .container {
-            display: flex;
-            gap: 30px;
+        display: flex;
+        gap: 30px;
+        height: 800px;
         }
+
         .left-panel {
             flex: 2;
             background-color: white;
@@ -25,7 +27,6 @@
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             max-width: 1000px;
-            max-height: 1300px;
             text-align: center;
         }
         .right-panel {
@@ -74,7 +75,7 @@
         </div>
 
         <div class="right-panel">
-            <h3 id="rating-title">평점 {{ top_rating }} 프로그램</h3>
+            <h3 id="rating-title">평점 {{ top_rating }}점대 프로그램</h3>
             <table class="program-table" id="program-table">
                 <thead>
                     <tr>
