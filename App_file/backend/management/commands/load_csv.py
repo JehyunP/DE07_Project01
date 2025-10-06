@@ -44,6 +44,8 @@ class Command(BaseCommand):
                         sub_name = clean_str(row.get("Sub_Genre"))
                         if sub_name:
                             sub_genre, _ = SubGenre.objects.get_or_create(genre=genre, name=sub_name)
+                        else :
+                            sub_genre, _ = SubGenre.objects.get_or_create(genre=genre, name='기타')
 
                     # 2) 프로그램
                     release_str = clean_str(row.get("Release"))
@@ -98,7 +100,7 @@ class Command(BaseCommand):
                                 Streaming.objects.create(program=program, ott=ott_name)
 
                     # 5) 인물
-                    for col, role in [("Starring", "Starring"), ("Director", "Director"), ("Produced_by", "Producer")]:
+                    for col, role in [("Starring", "Starring"), ("Directors", "Directors"), ("Produced_by", "Producer")]:
                         val = clean_str(row.get(col))
                         if val:
                             for name in val.split(","):

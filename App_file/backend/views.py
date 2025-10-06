@@ -41,7 +41,7 @@ def detail(request, program_id):
     program = get_object_or_404(Program, pk=program_id)
     performances = program.performances.all().order_by("-half_year")  
     streamings = program.streamings.all()  
-    directors = program.person_roles.filter(role__iexact="director")
+    directors = program.person_roles.filter(role__iexact="directors")
     actors = program.person_roles.filter(role__iexact="starring")
     producers = program.person_roles.filter(role__iexact="producer")
 
@@ -88,7 +88,7 @@ def subgenre_distribution_api(request, genre_id, half_year):
         .order_by("-count")
     )
 
-    labels = [item["program__sub_genre__name"] or "기타" for item in data]
+    labels = [item["program__sub_genre__name"] for item in data]
     counts = [item["count"] for item in data]
     ids = [item["program__sub_genre__id"] for item in data]
 
