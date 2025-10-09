@@ -1,30 +1,24 @@
-# 파이썬 기본 유틸리티
+# Python 기본 유틸리티
 from io import BytesIO
 import base64
 import random
-import ast
-
-from django.views import generic
-from django.urls import reverse_lazy
-from django.contrib.auth.forms import UserCreationForm
-from django.db.models import Count
 import json
 
 # Django 기본 기능
 from django.shortcuts import render, get_object_or_404
-
+from django.urls import reverse_lazy
 # Django ORM 기능
-from django.db.models import Sum, Count, F, FloatField, Window, Avg
-from django.db.models.functions import Cast, RowNumber, Floor
+from django.db.models import Sum, Count, Avg
+from django.db.models.functions import Floor
 
-# 데이터 분석 / 시각화 라이브러리
+# 데이터 분석 및 시각화 라이브러리
 import pandas as pd
 import plotly.express as px
 import plotly.io as pio
 import plotly.graph_objects as go
 from wordcloud import WordCloud
 
-# 프로젝트 내부 모듈
+# 내부 모듈
 from .models import *
 from . import visualize
 from .models import Performance
@@ -249,7 +243,7 @@ def index(request):
     
 # 스트리밍 플랫폼 뷰
 
-# OTT 대표 색상
+# OTT 브랜드 컬러
 OTT_COLORS = {
     'Netflix': '#E50914',
     'Disney+': '#01147C',
@@ -263,10 +257,12 @@ OTT_COLORS = {
     'Discovery+': '#FF6600'
 }
 
-# 워드클라우드 색상 함수
+# 색상 함수
 def color_func(word, font_size, position, orientation, random_state=None, **kwargs):
+    # 미리 정의한 OTT 브랜드 컬러가 있으면 사용
     if word in OTT_COLORS:
         return OTT_COLORS[word]
+    # 없으면 랜덤 컬러 생성
     r = random.randint(50, 200)
     g = random.randint(50, 200)
     b = random.randint(50, 200)
@@ -288,13 +284,15 @@ def generate_wordcloud(freq_dict):
         height=500,
         background_color='white',
         color_func=color_func,
-        relative_scaling=0.75
+        relative_scaling=0.75   # 빈도에 따른 폰트 크기 민감도(0~1)
     ).generate_from_frequencies(freq_dict)
     
+    # 워드클라우드 이미지를 메모리 버퍼에 저장 -> HTML용 base64 텍스트로 인코딩
     buffer = BytesIO()
     wc.to_image().save(buffer, format='PNG')
     encoded = base64.b64encode(buffer.getvalue()).decode()
     
+    # Plotly가 그래프처럼 읽을 수 있는 이미지 객체(go.Image)로 변환
     fig = go.Figure(go.Image(source='data:image/png;base64,' + encoded))
     fig.update_layout(
         margin=dict(l=0, r=0, t=0, b=0),
@@ -313,9 +311,9 @@ def generate_bar_chart(df, xlabel, ylabel):
         color='OTT',
         color_discrete_map=OTT_COLORS,
         hover_data={
+            'OTT': False,
             'Ratio': ':.2f',
-            'Count': True,
-            'OTT': False
+            'Count': True
         }
     )
     fig.update_layout(
@@ -325,7 +323,7 @@ def generate_bar_chart(df, xlabel, ylabel):
         template='plotly_white',
         autosize=True,
         margin=dict(l=40, r=40, t=30, b=50),
-        legend=dict(
+        legend=dict(    # 범례
             title_text="",
             orientation='h',
             x=0.5,
@@ -340,7 +338,7 @@ def generate_bar_chart(df, xlabel, ylabel):
 def ottplatformRank(request):
     performances = Performance.objects.all()
     data_list = []
-    
+    # Performance > Program > Streaming 필요 데이터
     for performance in performances:
         program = performance.program
         for streaming in program.streamings.all():
@@ -352,7 +350,6 @@ def ottplatformRank(request):
                 'poster': program.poster,
                 'views': performance.views,
             })
-            
     df = pd.DataFrame(data_list)
     
     if df.empty:
@@ -365,12 +362,15 @@ def ottplatformRank(request):
     results = {}
     
     for half in sorted(df["half_year"].unique()):
+        # 해당 반기 데이터 필터링
         df_half = df[df["half_year"] == half]
         label = half_year_label(half)
         
-        # OTT별 보유 작품 수 비율
+        # OTT별 보유 작품 수 집계
         ott_program_count = df_half.groupby("ott")["program_id"].nunique()
+        # OTT별 보유 작품 수 비율 계산
         ott_program_ratio = (ott_program_count / 300) * 100
+        
         df_cnt_rat = pd.DataFrame({
             "OTT": ott_program_count.index,
             "Count": ott_program_count.values,
@@ -378,16 +378,14 @@ def ottplatformRank(request):
         })
         df_top10 = df_cnt_rat.sort_values(by="Ratio", ascending=False).head(10)
         
-        # 시각화
+        # 시각화 HTML 생성
         wc_html = generate_wordcloud(ott_program_count.to_dict())
-        bar_html = generate_bar_chart(
-            df_top10,
-            "OTT 플랫폼", "점유율(%)"
-        )
+        bar_html = generate_bar_chart(df_top10, "OTT 플랫폼", "점유율(%)")
         
         # OTT별 인기작 Top3
         ott_top3 = {}
         for ott in df_half["ott"].unique():
+            # 해당 OTT 데이터 필터링 후, 프로그램 단위로 조회수 합산
             ranking = (
                 df_half[df_half["ott"] == ott]
                 .groupby(["program_id", "title", "poster"])["views"]
@@ -395,8 +393,10 @@ def ottplatformRank(request):
                 .reset_index()
                 .sort_values(by="views", ascending=False)
             )
+            # 상위 3개 저장
             ott_top3[ott] = ranking.head(3).to_dict("records")
-            
+        
+        # 반기별 결과물
         results[half] = {
             "label": label,
             "charts": [

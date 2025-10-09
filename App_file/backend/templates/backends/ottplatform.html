@@ -5,11 +5,12 @@
 
 {% block content %}
 <style>
-/* 반기 전환 버튼 스타일 */
+/* 반기 전환 버튼 전체 컨테이너 */
 .half-tab-container {
     text-align: center;
     margin-bottom: 25px;
 }
+/* 반기 전환 버튼 */
 .half-tab {
     background-color: #ffffff;
     border: 1px solid #d0d0d0;
@@ -22,16 +23,11 @@
     transition: all 0.2s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
+/* 반기 전환 버튼 호버 상태 */
 .half-tab:hover {
     background-color: #f0f0f0;
 }
-.half-tab.active {
-    background-color: #4e73df;
-    color: #fff;
-    border-color: #4e73df;
-    box-shadow: 0 4px 10px rgba(78,115,223,0.3);
-}
-/* 카드 스타일 */
+/* 카드 */
 .chart-card {
     background-color: white;
     border-radius: 16px;
@@ -54,6 +50,7 @@
         {% endfor %}
     </div>
 
+    <!-- 반기별 콘텐츠 -->
     {% for half, data in results.items %}
     <div id="half-{{ half }}" class="half-container" style="display:none;">
         <div style="display:flex; flex-direction:column; gap:30px;">
@@ -123,32 +120,37 @@
     {% endfor %}
 </div>
 
+<!-- 뒤로가기 링크 -->
 <a href="{% url 'backends:index' %}" class="back-card">
     <div class="back-card-body">← 뒤로가기</div>
 </a>
 
 <script>
-// DOM id에서 쓸 수 있는 형태로 바꾸기
+// 물자열을 DOM id에서 쓸 수 있는 형태로 바꾸기
 function normalizeSlug(str) {
     return str.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 // 반기 설정
 function showHalf(half) {
+    // 모든 반기 컨테이너 숨기기
     document.querySelectorAll(".half-container").forEach(div => div.style.display = "none");
+    // 현재 선택한 반기 컨테이너 표시
     var current = document.getElementById("half-" + half);
     current.style.display = "block";
 }
 // 막대 클릭 이벤트
 document.addEventListener("DOMContentLoaded", function() {
+    // 모든 반기 컨테이너 내의 Plotly 차트
     document.querySelectorAll(".half-container .js-plotly-plot").forEach(chart => {
+        // 차트에 데이터 포인트 클릭 이벤트 발생
         chart.on("plotly_click", function(data) {
             var halfId = chart.closest(".half-container").id.replace("half-", "");
             var ott = data.points[0].x;
             var ottId = "ott-" + halfId + "-" + normalizeSlug(ott);
 
-            document.querySelectorAll("#half-" + halfId + " .ott-top3")
-                    .forEach(div => div.style.display = "none");
-
+            // 모든 Top3 섹션 숨기기
+            document.querySelectorAll("#half-" + halfId + " .ott-top3").forEach(div => div.style.display = "none");
+            // 대상 OTT Top3 섹션 표시
             var target = document.getElementById(ottId);
             if (target) target.style.display = "block";
         });
