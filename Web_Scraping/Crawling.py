@@ -1,5 +1,4 @@
-# import Libraries
-# for Crawling
+# import Libraries for Crawling
 from bs4 import BeautifulSoup as bs
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
@@ -8,9 +7,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait as ww
 from selenium.webdriver.support import expected_conditions as ec
-import re
 
-# for data fram
+# for data frame
 import pandas as pd
 
 # Target URL and YEAR selection
@@ -43,19 +41,20 @@ options.add_argument('--disable-features=IsolateOrigins,site-per-process')
 options.add_argument('--log-level=3')          
 options.add_experimental_option('excludeSwitches', ['enable-logging']) 
 
-
+# driver setup via Chrome
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
 
 # loop through all years
 for half_year in YEAR:
 
-    # Loop for 10 pages: 1-10
+    # Loop for 10 pages: 1-7 : 300 data
     # try except block to handle any errors during scraping
     try:
         for i in range(1, 7):
             page_url = URL + half_year + '/page-' + str(i) + '/'
             driver.get(page_url)
-    
+
+            # Wait for web loading
             try:
                 ww(driver, 3).until(
                     ec.presence_of_element_located((By.CSS_SELECTOR, "tbody tr"))
@@ -64,7 +63,7 @@ for half_year in YEAR:
                 print(f"Timeout waiting for page {page_url}: {e}")
                 continue
 
-
+            # Debug check each pages
             print(f'Scraping page: {page_url}')
             
             # parse the page source with BeautifulSoup
@@ -91,14 +90,15 @@ for half_year in YEAR:
                     hours = cols[6].find("div").get_text(strip=True)
                     runtime = cols[7].get_text(strip=True)
                     views = cols[8].find("div").get_text(strip=True)
-                except Exception as e:
+                except Exception as e: # Debuger for each column 
                     print(f'Error Occured at mainpage with {e}')
                 print(title)
 
                 # Navigate to the detail page to get more information     
                 link = cols[1].find("a")["href"]
                 detail_url = "https://flixpatrol.com" + link
-                
+
+                # Open new window with detail page
                 driver.execute_script('window.open(arguments[0]);', detail_url)
                 driver.switch_to.window(driver.window_handles[1])
                 ww(driver, 3).until(
@@ -110,6 +110,7 @@ for half_year in YEAR:
 
                 # Extract additional details
 
+                # Description
                 try:
                     description_elem = detail_soup.select_one(
                         "div.card.-mx-content > div:not(:has(table))"
@@ -119,6 +120,7 @@ for half_year in YEAR:
                     print(f'Error extracting description for {title}: {e}')
                     description = None
 
+                # Persons info : Starring, directors an d producer
                 dl_block = detail_soup.select_one(
                     "div.card.-mx-content > dl"
                 )
@@ -138,6 +140,7 @@ for half_year in YEAR:
                 directors = info_dict.get('Directed by', None)
                 produced_by = info_dict.get('Produced by', None)
 
+                # Production
                 try:
                     production = None
 
@@ -160,6 +163,7 @@ for half_year in YEAR:
                     print(f'Error extracting production for {title}: {e}')
                     production = None
 
+                # Sub genre : check production exists -> to determine production location
                 try:
                     genre_position = 6 if production else 5
                     sub_genre = detail_soup.select_one(
@@ -169,18 +173,18 @@ for half_year in YEAR:
                     print(f'Error extracting sub_genre for {title}: {e}')
                     sub_genre = None
 
-
+                # IMDB
                 imdb = detail_soup.select_one(
                     "div.flex.flex-wrap.justify-around.text-center > div.px-2.py-4.w-32 > div.mb-1.text-2xl.text-gray-400"
                 ).get_text(strip=True).split('/')[0]
                 
 
-
+                # Rotten Tomatoes
                 rotten_tomatos = detail_soup.select_one(
                     "div.flex.flex-wrap.justify-around.text-center > div.px-2.py-4.w-40 > div.mb-1.text-2xl.text-gray-400"
                 ).get_text(strip=True).rstrip('%')
 
-                
+                # Get poster URL
                 try:
                     poster_elem = driver.find_element(
                         By.XPATH,
@@ -217,6 +221,7 @@ for half_year in YEAR:
                     for h2 in updated_soup.select("div[id^=toc-] > h2"):
                         span = h2.select_one("span:nth-of-type(2)")
                         if span:
+                            # Get OTT name after 'on'
                             text = span.get_text(strip=True)
                             match = text.rsplit(" on ", 1)[-1].strip()
                             if match:

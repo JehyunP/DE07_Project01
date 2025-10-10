@@ -7,9 +7,12 @@ import json
 # Django 기본 기능
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
+from django.http import JsonResponse
+
 # Django ORM 기능
 from django.db.models import Sum, Count, Avg
 from django.db.models.functions import Floor
+
 
 # 데이터 분석 및 시각화 라이브러리
 import pandas as pd
@@ -21,7 +24,6 @@ from wordcloud import WordCloud
 # 내부 모듈
 from .models import *
 from . import visualize
-from .models import Performance
 
 # Create your views here.
 def index(request):
@@ -30,8 +32,9 @@ def index(request):
 
     return render(request, 'backends/index.html', context)
 
-
+# 디테일 페이지 소스 추출
 def detail(request, program_id):
+    # 해당 프로젝트의 아이디와 연결된 데이터 추출
     program = get_object_or_404(Program, pk=program_id)
     performances = program.performances.all().order_by("-half_year")  
     streamings = program.streamings.all()  
@@ -48,6 +51,7 @@ def detail(request, program_id):
         "producers": producers,
     }
     return render(request, "backends/detail.html", context)
+
 
 def genre_distribution(request, half_year):
     data = (
@@ -72,7 +76,7 @@ def genre_distribution(request, half_year):
     }
     return render(request, "backends/genrensub.html", context)
 
-from django.http import JsonResponse
+
 
 def subgenre_distribution_api(request, genre_id, half_year):
     data = (
@@ -120,6 +124,8 @@ def subgenre_programs(request, subgenre_id, half_year):
         "half_year_display": half_year_display,
     })
 
+
+# Normalize rank by index
 def setGenreIndex():
     qs = (
         Performance.objects.
@@ -166,6 +172,7 @@ def setGenreIndex():
     return df, df_all
 
 
+# 년도별 장르 변화 시각화
 def genreTrend(request):
     chart_html = visualize.rank_half_year_plot(setGenreIndex()[0])
 
@@ -178,6 +185,7 @@ def genreTrend(request):
     )
 
 
+# 장르 변화 플롯 클릭시 발생된 이벤트 기준 상위 5개 작품 시각화
 def genreDetail(request):
     genre = request.GET.get("genre")
     half_year = request.GET.get("half_year")

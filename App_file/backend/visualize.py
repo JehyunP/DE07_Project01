@@ -2,6 +2,8 @@ import plotly.graph_objects as go
 import plotly.io as pio
 import plotly.express as px
 
+
+# 시각화 페이지 
 def rank_half_year_plot(df):
     genres = df['genre'].unique()
     df_top10_view = df[df['view_rank'] <= 10]
@@ -152,6 +154,8 @@ def rank_half_year_plot(df):
 def wrap_labels(text, width=20):
     return '<br>'.join([text[i:i+width] for i in range(0, len(text), width)])
 
+
+# 장르 선택시 선택된 년도의 상위 5개의 작품 -> bar plot
 def detail_bar_plot(df, genre, half_year, mode):
     y_col = "views" if mode == "views" else "hours"
     y_label = "조회수" if mode == "views" else "시청시간"
